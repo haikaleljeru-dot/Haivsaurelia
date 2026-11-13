@@ -50,7 +50,29 @@ window.ASSET_MANIFEST = window.ASSET_MANIFEST || {
   fat_hai_2: "assets/fatalities/fatality_hai_2.webp",
   // Planches
   planche_aurelia: "assets/ui/planche_aurelia.webp",
-  planche_hai: "assets/ui/planche_hai.webp"
+  planche_hai: "assets/ui/planche_hai.webp",
+  // ===== v4 : L'Œil Quantique (3e personnage), Tel-Aviv, Friendships / Animalities, fins =====
+  eye_idle: "assets/sprites/eye_idle.webp",
+  eye_punch: "assets/sprites/eye_punch.webp",
+  eye_kick: "assets/sprites/eye_kick.webp",
+  eye_ult: "assets/sprites/eye_ult.webp",
+  eye_hit: "assets/sprites/eye_hit.webp",
+  eye_cyber: "assets/portraits/eye_cyber.webp",
+  stage_telaviv: "assets/stages/stage_telaviv.webp",
+  xray_eye: "assets/cinematics/xray_eye.webp"
+};
+// v4 : illustrations non critiques chargées en arrière-plan après le démarrage (Friendships, Animalities, fins…)
+window.ASSET_LAZY = window.ASSET_LAZY || {
+  fat_eye_1: "assets/fatalities/fatality_eye_1.webp",
+  fat_eye_2: "assets/fatalities/fatality_eye_2.webp",
+  friendship_aur: "assets/fatalities/friendship_aur.webp",
+  friendship_hai: "assets/fatalities/friendship_hai.webp",
+  friendship_eye: "assets/fatalities/friendship_eye.webp",
+  animality_aur: "assets/fatalities/animality_aur.webp",
+  animality_hai: "assets/fatalities/animality_hai.webp",
+  animality_eye: "assets/fatalities/animality_eye.webp",
+  ending_eye: "assets/cinematics/ending_eye.webp",
+  secret_ending: "assets/cinematics/secret_ending.webp"
 };
 // Vidéos cinématiques MP4 (768×432, H.264) — data-URI dans la version autonome
 window.VIDEO_MANIFEST = window.VIDEO_MANIFEST || {

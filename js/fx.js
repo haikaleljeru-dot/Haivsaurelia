@@ -9,6 +9,7 @@ const QUALITY = { level: "haute", mult: 1 };
 const HEB = "אבגדהוזחטיכלמנסעפצקרשת";
 const BIN = "01";
 const RUNES = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ";
+const SACRED = "✡☉◬⟁△▽◇✦⌬⏣⎔";
 
 function rnd(a = 1, b) { return b === undefined ? Math.random() * a : a + Math.random() * (b - a); }
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -185,6 +186,11 @@ const Weather = {
       for (let i = 0; i < 46 * m; i++) this.cols.push({ x: rnd(W), y: rnd(-H, H), v: rnd(3, 9), len: (rnd(6, 16)) | 0, c: pick(["#22d3ee", "#fbbf24", "#c084fc"]), chars: Array.from({ length: 16 }, () => pick(BIN + "ΣΩΔ∞λ")) });
       for (let i = 0; i < 22 * m; i++) this.shards.push({ x: rnd(W), y: rnd(H * 0.8), r: rnd(6, 18), rot: rnd(6), vr: rnd(-0.02, 0.02), vy: rnd(-0.3, 0.3), ph: rnd(6) });
     }
+    if (stage.weather === "neon") { // Tel-Aviv : lucioles néon, scintillements sur la mer, drones
+      for (let i = 0; i < 70 * m; i++) this.embers.push({ x: rnd(W), y: rnd(H), vy: rnd(0.2, 0.8), vx: rnd(0.1, 0.6), s: rnd(1.5, 3.5), ph: rnd(6), c: pick(["#22d3ee", "#ec4899", "#fde68a"]) });
+      for (let i = 0; i < 40 * m; i++) this.shards.push({ x: rnd(260, W), y: rnd((stage.sea || 400) + 5, (stage.sea || 400) + 90), ph: rnd(6), s: rnd(10, 40) });
+      for (let i = 0; i < 5; i++) this.cols.push({ x: rnd(W), y: rnd(40, 200), v: rnd(0.3, 0.9) * (i % 2 ? 1 : -1), ph: rnd(6) });
+    }
   },
   update() {
     const st = this.stage; if (!st) return;
@@ -198,6 +204,10 @@ const Weather = {
     } else if (st.weather === "code") {
       for (const c of this.cols) { c.y += c.v; if (c.y - c.len * 18 > H) { c.y = rnd(-200, -20); c.x = rnd(W); } if (Math.random() < 0.05) c.chars[(rnd(16)) | 0] = pick(BIN + "ΣΩΔ∞λ"); }
       for (const s of this.shards) { s.rot += s.vr; s.y += Math.sin((s.ph += 0.01)) * 0.3; }
+    } else if (st.weather === "neon") {
+      for (const e of this.embers) { e.y -= e.vy; e.x += e.vx + Math.sin((e.ph += 0.02)) * 0.3; if (e.y < -20) { e.y = H + 10; e.x = rnd(W); } if (e.x > W + 20) e.x = -20; }
+      for (const s of this.shards) s.ph += 0.05;
+      for (const d of this.cols) { d.x += d.v; d.ph += 0.1; if (d.x > W + 60) d.x = -60; if (d.x < -60) d.x = W + 60; }
     }
   },
   drawBack(ctx, t) {
@@ -215,6 +225,15 @@ const Weather = {
         if (e.glyph) { ctx.globalAlpha = 0.35 + 0.25 * Math.sin(e.ph * 3); ctx.fillStyle = "#fbbf24"; ctx.font = `${e.s | 0}px serif`; ctx.fillText(e.glyph, e.x, e.y); }
         else { ctx.globalAlpha = 0.6 + 0.4 * Math.sin(e.ph * 4); const s = e.s * 5; ctx.drawImage(glowSprite("#f59e0b"), e.x - s / 2, e.y - s / 2, s, s); }
       }
+    } else if (st.weather === "neon") {
+      ctx.globalCompositeOperation = "lighter";
+      const [lx, ly] = st.lighthouse || [308, 236], a = Math.sin(t * 0.012) * 0.55 + 0.1;
+      ctx.save(); ctx.translate(lx, ly); ctx.rotate(a); const g = ctx.createLinearGradient(0, 0, 900, 0); g.addColorStop(0, "rgba(253,230,138,0.28)"); g.addColorStop(1, "rgba(34,211,238,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(900, -60); ctx.lineTo(900, 60); ctx.closePath(); ctx.fill(); ctx.restore();
+      const gs = 70 + 20 * Math.sin(t * 0.1); ctx.globalAlpha = 0.8; ctx.drawImage(glowSprite("#fde68a"), lx - gs / 2, ly - gs / 2, gs, gs);
+      for (const s of this.shards) { ctx.globalAlpha = Math.max(0, Math.sin(s.ph)) * 0.55; ctx.fillStyle = "#a5f3fc"; ctx.fillRect(s.x, s.y, s.s, 1.5); }
+      for (const d of this.cols) { ctx.globalAlpha = 0.5 + 0.5 * Math.sin(d.ph); const s2 = 26; ctx.drawImage(glowSprite(d.v > 0 ? "#ec4899" : "#22d3ee"), d.x - s2 / 2, d.y - s2 / 2, s2, s2); ctx.globalAlpha = 0.9; ctx.fillStyle = "#0b1020"; ctx.fillRect(d.x - 10, d.y - 2, 20, 4); }
+      for (const e of this.embers) { ctx.globalAlpha = 0.45 + 0.35 * Math.sin(e.ph * 4); const s3 = e.s * 5; ctx.drawImage(glowSprite(e.c), e.x - s3 / 2, e.y - s3 / 2, s3, s3); }
     } else if (st.weather === "code") {
       const [ex, ey] = st.eye; const pulse = 0.5 + 0.5 * Math.sin(t * 0.04);
       ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = 0.25 + 0.2 * pulse; const s = 300 + pulse * 40; ctx.drawImage(glowSprite("#a855f7"), ex - s / 2, ey - s / 2, s, s);

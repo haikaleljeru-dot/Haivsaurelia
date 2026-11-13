@@ -19,6 +19,15 @@ window.VOICE_MANIFEST = window.VOICE_MANIFEST || {
   cine_ending_hai_2_0: "assets/voices/cine_ending_hai_2_0.mp3",
   cine_ending_hai_2_1: "assets/voices/cine_ending_hai_2_1.mp3",
   cine_interlude_jerusalem_0_0: "assets/voices/cine_interlude_jerusalem_0_0.mp3",
+  cine_ending_eye_0_0: "assets/voices/cine_ending_eye_0_0.mp3",
+  cine_ending_eye_1_0: "assets/voices/cine_ending_eye_1_0.mp3",
+  cine_ending_eye_1_1: "assets/voices/cine_ending_eye_1_1.mp3",
+  cine_secret_0_0: "assets/voices/cine_secret_0_0.mp3",
+  cine_secret_1_0: "assets/voices/cine_secret_1_0.mp3",
+  cine_secret_1_1: "assets/voices/cine_secret_1_1.mp3",
+  cine_secret_1_2: "assets/voices/cine_secret_1_2.mp3",
+  cine_secret_2_0: "assets/voices/cine_secret_2_0.mp3",
+  cine_secret_2_1: "assets/voices/cine_secret_2_1.mp3",
   cine_interlude_singularity_0_0: "assets/voices/cine_interlude_singularity_0_0.mp3",
   pre_paris_0: "assets/voices/pre_paris_0.mp3",
   pre_paris_1: "assets/voices/pre_paris_1.mp3",
@@ -29,6 +38,33 @@ window.VOICE_MANIFEST = window.VOICE_MANIFEST || {
   pre_singularity_0: "assets/voices/pre_singularity_0.mp3",
   pre_singularity_1: "assets/voices/pre_singularity_1.mp3",
   pre_singularity_2: "assets/voices/pre_singularity_2.mp3",
+  dlg_paris2_0: "assets/voices/dlg_paris2_0.mp3",
+  dlg_paris2_1: "assets/voices/dlg_paris2_1.mp3",
+  dlg_paris2_2: "assets/voices/dlg_paris2_2.mp3",
+  dlg_jeru2_0: "assets/voices/dlg_jeru2_0.mp3",
+  dlg_jeru2_1: "assets/voices/dlg_jeru2_1.mp3",
+  dlg_jeru2_2: "assets/voices/dlg_jeru2_2.mp3",
+  dlg_sing2_0: "assets/voices/dlg_sing2_0.mp3",
+  dlg_sing2_1: "assets/voices/dlg_sing2_1.mp3",
+  dlg_sing2_2: "assets/voices/dlg_sing2_2.mp3",
+  dlg_tlv1_0: "assets/voices/dlg_tlv1_0.mp3",
+  dlg_tlv1_1: "assets/voices/dlg_tlv1_1.mp3",
+  dlg_tlv1_2: "assets/voices/dlg_tlv1_2.mp3",
+  dlg_tlv2_0: "assets/voices/dlg_tlv2_0.mp3",
+  dlg_tlv2_1: "assets/voices/dlg_tlv2_1.mp3",
+  dlg_tlv2_2: "assets/voices/dlg_tlv2_2.mp3",
+  dlg_ae1_0: "assets/voices/dlg_ae1_0.mp3",
+  dlg_ae1_1: "assets/voices/dlg_ae1_1.mp3",
+  dlg_ae1_2: "assets/voices/dlg_ae1_2.mp3",
+  dlg_ae2_0: "assets/voices/dlg_ae2_0.mp3",
+  dlg_ae2_1: "assets/voices/dlg_ae2_1.mp3",
+  dlg_ae2_2: "assets/voices/dlg_ae2_2.mp3",
+  dlg_he1_0: "assets/voices/dlg_he1_0.mp3",
+  dlg_he1_1: "assets/voices/dlg_he1_1.mp3",
+  dlg_he1_2: "assets/voices/dlg_he1_2.mp3",
+  dlg_he2_0: "assets/voices/dlg_he2_0.mp3",
+  dlg_he2_1: "assets/voices/dlg_he2_1.mp3",
+  dlg_he2_2: "assets/voices/dlg_he2_2.mp3",
   aur_sp1: "assets/voices/aur_sp1.mp3",
   aur_sp2: "assets/voices/aur_sp2.mp3",
   aur_tele: "assets/voices/aur_tele.mp3",
@@ -47,6 +83,18 @@ window.VOICE_MANIFEST = window.VOICE_MANIFEST || {
   hai_taunt2: "assets/voices/hai_taunt2.mp3",
   hai_win: "assets/voices/hai_win.mp3",
   hai_fat: "assets/voices/hai_fat.mp3",
+  aur_friend: "assets/voices/aur_friend.mp3",
+  hai_friend: "assets/voices/hai_friend.mp3",
+  eye_sp1: "assets/voices/eye_sp1.mp3",
+  eye_sp2: "assets/voices/eye_sp2.mp3",
+  eye_tele: "assets/voices/eye_tele.mp3",
+  eye_xray: "assets/voices/eye_xray.mp3",
+  eye_brk: "assets/voices/eye_brk.mp3",
+  eye_taunt1: "assets/voices/eye_taunt1.mp3",
+  eye_taunt2: "assets/voices/eye_taunt2.mp3",
+  eye_win: "assets/voices/eye_win.mp3",
+  eye_fat: "assets/voices/eye_fat.mp3",
+  eye_friend: "assets/voices/eye_friend.mp3",
   ann_round1: "assets/voices/ann_round1.mp3",
   ann_round2: "assets/voices/ann_round2.mp3",
   ann_round3: "assets/voices/ann_round3.mp3",
@@ -64,7 +112,13 @@ window.VOICE_MANIFEST = window.VOICE_MANIFEST || {
   ann_time_over: "assets/voices/ann_time_over.mp3",
   ann_first_blood: "assets/voices/ann_first_blood.mp3",
   ann_excellent: "assets/voices/ann_excellent.mp3",
-  ann_brutal: "assets/voices/ann_brutal.mp3"
+  ann_brutal: "assets/voices/ann_brutal.mp3",
+  ann_finish_it: "assets/voices/ann_finish_it.mp3",
+  ann_eye_win: "assets/voices/ann_eye_win.mp3",
+  ann_friendship: "assets/voices/ann_friendship.mp3",
+  ann_animality: "assets/voices/ann_animality.mp3",
+  ann_tower: "assets/voices/ann_tower.mp3",
+  ann_online: "assets/voices/ann_online.mp3"
 };
 const VOICE_LINES = {
 "cine_intro_0_0": {
@@ -100,12 +154,12 @@ const VOICE_LINES = {
 "cine_intro_3_0": {
 "who": "L'ŒIL QUANTIQUE",
 "text": "DEUX CHAMPIONS. UN SEUL TRÔNE. LE MULTIVERS EXIGE UN KOMBAT.",
-"dur": 5.472
+"dur": 6.096
 },
 "cine_intro_3_1": {
 "who": "L'ŒIL QUANTIQUE",
 "text": "TROIS ARÈNES. TROIS ÉPREUVES. QUE LE PLUS DIGNE RÉÉCRIVE LA RÉALITÉ.",
-"dur": 5.76
+"dur": 6.504
 },
 "cine_intro_4_0": {
 "who": "AURÉLIA",
@@ -120,7 +174,7 @@ const VOICE_LINES = {
 "cine_ending_aurelia_0_0": {
 "who": "L'ŒIL QUANTIQUE",
 "text": "L'OMBRE A TRIOMPHÉ. LA SINGULARITÉ S'INCLINE DEVANT L'ÉCLIPSE.",
-"dur": 4.824
+"dur": 5.064
 },
 "cine_ending_aurelia_1_0": {
 "who": "AURÉLIA",
@@ -140,7 +194,7 @@ const VOICE_LINES = {
 "cine_ending_hai_0_0": {
 "who": "L'ŒIL QUANTIQUE",
 "text": "LE CODE SOURCE A ÉTÉ RÉÉCRIT. L'ARCHONTE ACCÈDE AU NOYAU.",
-"dur": 4.512
+"dur": 4.776
 },
 "cine_ending_hai_1_0": {
 "who": "HAÏ",
@@ -161,6 +215,51 @@ const VOICE_LINES = {
 "who": "NARRATEUR",
 "text": "La faille s'élargit. Le combat se déplace vers le sanctuaire des codes sacrés…",
 "dur": 4.848
+},
+"cine_ending_eye_0_0": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "AURÉLIA. HAÏ. VOS CODES M'APPARTIENNENT DÉSORMAIS.",
+"dur": 5.304
+},
+"cine_ending_eye_1_0": {
+"who": "NARRATEUR",
+"text": "Sur son trône de cristal noir, l'Œil Quantique contemple chaque univers à la fois.",
+"dur": 4.536
+},
+"cine_ending_eye_1_1": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "PARIS. JÉRUSALEM. TEL-AVIV. TOUT EST DONNÉE. TOUT EST À MOI.",
+"dur": 8.4
+},
+"cine_secret_0_0": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "IMPOSSIBLE. AUCUN ROUND PERDU. VOTRE LIEN DÉFIE TOUS MES CALCULS.",
+"dur": 6.576
+},
+"cine_secret_1_0": {
+"who": "NARRATEUR",
+"text": "Pour la première fois depuis l'aube du code, l'Œil Quantique se fissure.",
+"dur": 3.696
+},
+"cine_secret_1_1": {
+"who": "AURÉLIA",
+"text": "Ce n'était jamais un duel, Haï. C'était une épreuve… pour nous deux.",
+"dur": 3.528
+},
+"cine_secret_1_2": {
+"who": "HAÏ",
+"text": "Alors brisons-le ensemble, mon Éclipse.",
+"dur": 2.376
+},
+"cine_secret_2_0": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "LE MULTIVERS… CHOISIT… L'AMOUR.",
+"dur": 2.784
+},
+"cine_secret_2_1": {
+"who": "NARRATEUR",
+"text": "Paris et Jérusalem fusionnent sous une aube nouvelle. Libéré, l'Œil Quantique rejoint désormais le Kombat.",
+"dur": 6.672
 },
 "cine_interlude_singularity_0_0": {
 "who": "NARRATEUR",
@@ -211,6 +310,141 @@ const VOICE_LINES = {
 "who": "AURÉLIA",
 "text": "Qu'il regarde. Il verra l'Éclipse avaler la lumière.",
 "dur": 2.928
+},
+"dlg_paris2_0": {
+"who": "AURÉLIA",
+"text": "Encore toi sous ma pluie, Haï ? Les gargouilles commencent à te reconnaître.",
+"dur": 3.576
+},
+"dlg_paris2_1": {
+"who": "HAÏ",
+"text": "Qu'elles regardent bien. Ce soir, c'est moi qui réécris Paris.",
+"dur": 4.032
+},
+"dlg_paris2_2": {
+"who": "AURÉLIA",
+"text": "Réécris ce que tu veux. Mes lames, elles, signent toujours en dernier.",
+"dur": 3.528
+},
+"dlg_jeru2_0": {
+"who": "AURÉLIA",
+"text": "Ton sanctuaire sent l'encens et le silicium, mon amour.",
+"dur": 2.712
+},
+"dlg_jeru2_1": {
+"who": "HAÏ",
+"text": "Chaque pierre ici est un serveur sacré. Elles vont te juger.",
+"dur": 3.744
+},
+"dlg_jeru2_2": {
+"who": "AURÉLIA",
+"text": "Qu'elles me jugent. L'Éclipse ne craint aucun verdict.",
+"dur": 2.808
+},
+"dlg_sing2_0": {
+"who": "HAÏ",
+"text": "Regarde, Aurélia… l'Œil s'est encore rapproché.",
+"dur": 2.832
+},
+"dlg_sing2_1": {
+"who": "AURÉLIA",
+"text": "Il veut un vainqueur. Offrons-lui le plus beau des spectacles.",
+"dur": 2.88
+},
+"dlg_sing2_2": {
+"who": "HAÏ",
+"text": "Et après ce combat, on rentre ensemble. Promis.",
+"dur": 3.432
+},
+"dlg_tlv1_0": {
+"who": "AURÉLIA",
+"text": "Tel-Aviv la nuit… la mer brille comme un écran géant.",
+"dur": 2.64
+},
+"dlg_tlv1_1": {
+"who": "HAÏ",
+"text": "Ma ville ne dort jamais, Aurélia. Et moi non plus.",
+"dur": 3.6
+},
+"dlg_tlv1_2": {
+"who": "AURÉLIA",
+"text": "Alors on danse sur la promenade… à coups de foudre.",
+"dur": 2.136
+},
+"dlg_tlv2_0": {
+"who": "HAÏ",
+"text": "Le phare de Jaffa guide les navires depuis trois mille ans.",
+"dur": 2.496
+},
+"dlg_tlv2_1": {
+"who": "AURÉLIA",
+"text": "Ce soir, il va surtout éclairer ta défaite.",
+"dur": 2.376
+},
+"dlg_tlv2_2": {
+"who": "HAÏ",
+"text": "On verra qui finira dans la Méditerranée.",
+"dur": 1.92
+},
+"dlg_ae1_0": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "AURÉLIA. TON OMBRE N'EST QU'UNE VARIABLE DANS MON ÉQUATION.",
+"dur": 4.464
+},
+"dlg_ae1_1": {
+"who": "AURÉLIA",
+"text": "Une variable ? Je suis l'erreur que tu n'as jamais prévue.",
+"dur": 2.784
+},
+"dlg_ae1_2": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "ALORS JE VAIS TE CORRIGER.",
+"dur": 1.608
+},
+"dlg_ae2_0": {
+"who": "AURÉLIA",
+"text": "C'est toi qui nous as jetés dans cette Fracture.",
+"dur": 1.776
+},
+"dlg_ae2_1": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "J'AI OBSERVÉ MILLE UNIVERS. DANS AUCUN, TU NE ME BATS.",
+"dur": 4.824
+},
+"dlg_ae2_2": {
+"who": "AURÉLIA",
+"text": "Alors celui-ci sera le premier.",
+"dur": 1.512
+},
+"dlg_he1_0": {
+"who": "HAÏ",
+"text": "Je reconnais ton code source, l'Œil. Il est corrompu.",
+"dur": 3.816
+},
+"dlg_he1_1": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "C'EST TOI, ARCHONTE, QUI N'ES QU'UNE LIGNE DE MON CODE.",
+"dur": 3.672
+},
+"dlg_he1_2": {
+"who": "HAÏ",
+"text": "Alors cette ligne va te supprimer.",
+"dur": 1.656
+},
+"dlg_he2_0": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "TES SCEAUX SACRÉS NE PROTÈGENT RIEN ICI, HACKER.",
+"dur": 3.096
+},
+"dlg_he2_1": {
+"who": "HAÏ",
+"text": "Ils ne protègent pas. Ils enferment.",
+"dur": 2.712
+},
+"dlg_he2_2": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "ESSAIE DONC DE M'ENFERMER.",
+"dur": 1.68
 },
 "aur_sp1": {
 "who": "AURÉLIA",
@@ -302,6 +536,66 @@ const VOICE_LINES = {
 "text": "Suppression définitive.",
 "dur": 1.464
 },
+"aur_friend": {
+"who": "AURÉLIA",
+"text": "Allez, un bisou… et on oublie tout !",
+"dur": 2.208
+},
+"hai_friend": {
+"who": "HAÏ",
+"text": "On fait la paix ? Celle-là, je la joue pour toi.",
+"dur": 3.336
+},
+"eye_sp1": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Prisme quantique.",
+"dur": 1.2
+},
+"eye_sp2": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Singularité !",
+"dur": 1.224
+},
+"eye_tele": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Repli dimensionnel.",
+"dur": 1.536
+},
+"eye_xray": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Effondrement neural !",
+"dur": 1.464
+},
+"eye_brk": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Accès révoqué.",
+"dur": 1.272
+},
+"eye_taunt1": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Je vois toutes tes fins possibles.",
+"dur": 1.92
+},
+"eye_taunt2": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Ton futur est déjà calculé.",
+"dur": 1.944
+},
+"eye_win": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Réalité réécrite.",
+"dur": 1.536
+},
+"eye_fat": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Ton existence est supprimée.",
+"dur": 1.848
+},
+"eye_friend": {
+"who": "L'ŒIL QUANTIQUE",
+"text": "Analyse terminée. Amitié détectée.",
+"dur": 3.6
+},
 "ann_round1": {
 "who": "ANNONCEUR",
 "text": "Round 1 !",
@@ -391,5 +685,35 @@ const VOICE_LINES = {
 "who": "ANNONCEUR",
 "text": "Brutal !",
 "dur": 0.744
+},
+"ann_finish_it": {
+"who": "ANNONCEUR",
+"text": "Finish it !",
+"dur": 0.936
+},
+"ann_eye_win": {
+"who": "ANNONCEUR",
+"text": "L'Œil Quantique gagne !",
+"dur": 1.416
+},
+"ann_friendship": {
+"who": "ANNONCEUR",
+"text": "Friendship !",
+"dur": 0.936
+},
+"ann_animality": {
+"who": "ANNONCEUR",
+"text": "Animality !",
+"dur": 1.008
+},
+"ann_tower": {
+"who": "ANNONCEUR",
+"text": "Tour des défis !",
+"dur": 0.984
+},
+"ann_online": {
+"who": "ANNONCEUR",
+"text": "Duel en ligne !",
+"dur": 1.08
 }
 };

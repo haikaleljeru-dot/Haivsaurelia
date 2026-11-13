@@ -15,12 +15,13 @@ function spriteKey(f) {
     default: k = sp.idle;
   }
   if (f.forceSprite) k = sp[f.forceSprite] || f.forceSprite;
-  if (Settings.outfit === "v1") { const v = "v1_" + k; if (IMG[v]) return v; if (k === sp.hit) return "v1_" + sp.idle; }
+  if (Settings.outfit === "v1" && f.costume === "base") { const v = "v1_" + k; if (IMG[v]) return v; if (k === sp.hit && IMG["v1_" + sp.idle]) return "v1_" + sp.idle; }
+  if (f.costume && f.costume !== "base" && typeof Costumes !== "undefined") return Costumes.key(f.id, f.costume, k);
   return k;
 }
 function spriteInfo(f, keyOverride) {
   const key = keyOverride || spriteKey(f); const img = IMG[key]; if (!img || !img.naturalWidth) return null;
-  const meta = f.ch.spriteMeta[key] || { h: 300, ax: 0.5 };
+  const meta = f.ch.spriteMeta[key] || f.ch.spriteMeta[(typeof COSTUME_BASE !== "undefined" && COSTUME_BASE[key]) || key] || { h: 300, ax: 0.5 };
   const h = meta.h * f.scale, w = img.naturalWidth / img.naturalHeight * h;
   return { key, img, w, h, ax: meta.ax, flip: meta.flip ? -1 : 1 };
 }
@@ -32,11 +33,14 @@ function startFinisher(att, vic, kind) {
   Match.projectiles.length = 0; endCombo(vic);
   att.vx = att.vy = vic.vx = 0; att.y = Match.stage.floor; att.trail = []; vic.trail = [];
   if (vic.y > Match.stage.floor) vic.y = Match.stage.floor;
-  const B = { fatality1: att.id === "aurelia" ? SeqAurF1 : SeqHaiF1, fatality2: att.id === "aurelia" ? SeqAurF2 : SeqHaiF2,
-    stage: [SeqStageParis, SeqStageJerusalem, SeqStageSingularity][Match.stageIdx], brutality: SeqBrutality };
+  const FAT = { aurelia: [SeqAurF1, SeqAurF2], hai: [SeqHaiF1, SeqHaiF2], eye: [SeqEyeF1, SeqEyeF2] }[att.id] || [SeqAurF1, SeqAurF2];
+  const STG = { paris: SeqStageParis, jerusalem: SeqStageJerusalem, singularity: SeqStageSingularity, telaviv: SeqStageTelAviv };
+  const B = { fatality1: FAT[0], fatality2: FAT[1], stage: STG[Match.stage.id] || SeqStageParis, brutality: SeqBrutality, friendship: SeqFriendship, animality: SeqAnimality };
   Match.seq = B[kind](att, vic);
   Audio2.stopMusic(); Audio2.play("heartbeat");
-  saveUnlock(kind === "stage" ? "stage_" + Match.stage.id : kind === "brutality" ? "brutality" : att.ch.fatalities[kind === "fatality1" ? 0 : 1].key);
+  const key = kind === "stage" ? "stage_" + Match.stage.id : kind === "brutality" ? "brutality" : kind === "friendship" ? att.ch.friendship.key : kind === "animality" ? att.ch.animality.key : att.ch.fatalities[kind === "fatality1" ? 0 : 1].key;
+  saveUnlock(key);
+  GameEv.emit("finisher", { att, vic, kind, key });
 }
 function finishSeqDone(att, vic) {
   Vid.stopAll();
@@ -63,16 +67,17 @@ function roundEndUpdate() {
     att.forceSprite = null; att.hidden = false; setState(att, "victory");
     const flawless = att.hp >= 99.9 && Match.perfect[att.side];
     const fin = Match.finisher;
-    const sub = flawless ? "FLAWLESS VICTORY" : fin === "fatality1" || fin === "fatality2" ? "FATALITY" : fin === "brutality" ? "BRUTALITY" : fin === "stage" ? "STAGE FATALITY" : "";
+    const sub = flawless ? "FLAWLESS VICTORY" : fin === "fatality1" || fin === "fatality2" ? "FATALITY" : fin === "brutality" ? "BRUTALITY" : fin === "stage" ? "STAGE FATALITY" : fin === "friendship" ? "FRIENDSHIP" : fin === "animality" ? "ANIMALITY" : "";
     UI.banner(att.ch.name + " GAGNE", sub, "win", 130);
-    Audio2.announce("win", (att.id === "aurelia" ? "Aurélia" : "Haï") + " gagne !", att.id === "aurelia" ? "ann_aur_win" : "ann_hai_win");
-    Match.winLineAt = 70 + Math.round((Audio2.voiceDur(att.id === "aurelia" ? "ann_aur_win" : "ann_hai_win") + 0.25) * 60);
+    Audio2.announce("win", att.ch.spoken + " gagne !", att.ch.annWin);
+    Match.winLineAt = 70 + Math.round((Audio2.voiceDur(att.ch.annWin) + 0.25) * 60);
+    GameEv.emit("roundWon", { att, vic, flawless, fin, round: Match.round });
     if (flawless) { Match.flawlessAt = Match.winLineAt; Match.winLineAt += Math.round((Audio2.voiceDur("ann_flawless") + 0.2) * 60); }
   }
   if (Match.st === Match.flawlessAt) { Audio2.voice("ann_flawless", { ch: "ann" }); if (!Audio2.hasVoice("ann_flawless")) Audio2.say("Flawless victory", 0.4, 0.85, "en-US"); }
   if (Match.st === Match.winLineAt) speak(att, "win", true);
   if (Match.st === 240) {
-    if (Match.wins[att.side] >= 2) { Match.state = "over"; UI.matchOver(att, vic); }
+    if (Match.wins[att.side] >= Match.winsNeeded) { Match.state = "over"; GameEv.emit("matchOver", { att, vic, frames: frameCount - Match.startFrame }); UI.matchOver(att, vic); }
     else { Match.round++; startRound(); }
   }
 }
@@ -161,7 +166,7 @@ function SeqAurF1(att, vic) {
       ring(cx, cy, "#e879f9", 20, 18, 30, 10);
     }
     if (s.pieces) for (const p of s.pieces) { p.vy += 0.35; p.ox += p.vx; p.oy += p.vy; p.rot += p.vr; const floorOff = fl + 10 - s.py - (3 - p.i) * 4; if (p.oy > floorOff) { p.oy = floorOff; p.vy *= -0.2; p.vx *= 0.8; p.vr *= 0.8; } }
-    if (t === 205) { panelArt(s, s.art, 205, FAT_PANEL, 1, "vid_fatality_aurelia"); speak(att, "fat", true); }
+    if (t === 205) { panelArt(s, s.art, 205, FAT_PANEL, 1, att.ch.fatVideo); speak(att, "fat", true); }
     if (t === 360) { UI.banner("FATALITY", s.name, "fatality", 170); Audio2.announce("fatality", "Fatality !", "ann_fatality"); }
     if (t >= 500) finishSeqDone(att, vic);
   };
@@ -216,7 +221,7 @@ function SeqAurF2(att, vic) {
       burst(cx, cy, "#d946ef", 160, 15, "orb", { size: 3 }); burst(cx, cy, "#7e22ce", 60, 12, "pixel", { size: 5, g: 0.02 }); ring(cx, cy, "#f0abfc", 10, 20, 30, 12);
     }
     if (s.tiles) for (const tl of s.tiles.tiles) { if (tl.delay > 0) { tl.delay--; continue; } const sw = 0.06, vx = tl.vx; tl.vx = vx * 0.97 - tl.vy * sw; tl.vy = tl.vy * 0.97 + vx * sw - 0.05; tl.ox += tl.vx; tl.oy += tl.vy; tl.rot += tl.vr; tl.a -= 0.012; if (Math.random() < 0.02) emit({ x: s.tiles.x + tl.lx + tl.ox, y: s.tiles.y + tl.ly + tl.oy, type: "orb", color: "#e879f9", size: 2, life: 20 }); }
-    if (t === 205) { panelArt(s, s.art, 205, FAT_PANEL, -1, "vid_fatality_aurelia"); speak(att, "fat", true); }
+    if (t === 205) { panelArt(s, s.art, 205, FAT_PANEL, -1, att.ch.fatVideo); speak(att, "fat", true); }
     if (t === 360) { UI.banner("FATALITY", s.name, "fatality", 170); Audio2.announce("fatality", "Fatality !", "ann_fatality"); }
     if (t >= 500) finishSeqDone(att, vic);
   };

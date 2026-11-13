@@ -31,7 +31,7 @@
 <link rel="apple-touch-icon" href="assets/icons/icon-180.png"><!--web-only-->
 <link rel="manifest" href="manifest.webmanifest"><!--web-only-->
 <link rel="stylesheet" href="css/fonts.css?v=9fb5b118db">
-<link rel="stylesheet" href="css/style.css?v=de14dfc1f2">
+<link rel="stylesheet" href="css/style.css?v=98dae29b61">
 </head>
 <body>
 <noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#fbbf24;font:700 20px sans-serif;text-align:center;padding:20px">JavaScript est requis pour jouer à Aurélia vs Haï.</div></noscript>
@@ -57,14 +57,21 @@
       <button class="mbtn gold" data-m="story">Mode Histoire<small>Campagne en 3 arènes • cinématiques • fins uniques</small></button>
       <button class="mbtn" data-m="vs">Duel contre l'IA<small>Novice • Guerrier • Maître • Cauchemar</small></button>
       <button class="mbtn" data-m="duo">2 Joueurs local<small>Même clavier ou manettes</small></button>
+      <button class="mbtn" data-m="online">Duel en ligne<small>P2P WebRTC • lien ou code à partager</small></button>
+      <button class="mbtn" data-m="tower">Tour des Défis<small>10 combats • modificateurs • récompenses</small></button>
       <button class="mbtn" data-m="train">Entraînement &amp; Démo Fatality<small>Mannequin, super infini, toutes les fatalities</small></button>
+      <button class="mbtn" data-m="tuto">Tutoriel interactif<small>Parade parfaite • Dash Cancel • codes de Fatality</small></button>
       <button class="mbtn" data-m="intro">Cinématique d'intro<small>La Fracture du Multivers — vidéo &amp; voix VF</small></button>
-      <button class="mbtn" data-m="gal">Galerie &amp; Krypte<small>Vidéos cinématiques, fins, fatalities, artworks</small></button>
+      <button class="mbtn" data-m="gal">Galerie<small>Vidéos cinématiques, fins, fatalities, artworks</small></button>
+      <button class="mbtn gold" data-m="krypt">La Krypte<small>Koins • personnages • costumes • arènes</small></button>
+      <button class="mbtn" data-m="troph">Trophées &amp; Classements<small>Succès • victoire la plus rapide • combos</small></button>
       <button class="mbtn" data-m="mv">Commandes &amp; Coups</button>
       <button class="mbtn" data-m="opt">Options</button>
     </div>
+    <div class="langSel" id="langSel"><button class="btn lng" data-lang="fr">FR</button><button class="btn lng" data-lang="en">EN</button><button class="btn lng" data-lang="he">עב</button></div>
+    <div class="koinTag" id="koinTag"></div>
     <div class="hint">↑↓ naviguer • Entrée valider • Échap retour • 🎮 compatible manette</div>
-    <div class="ver">v3.0 — ÉDITION ULTRA • VIDÉOS • VOIX VF</div>
+    <div class="ver">v4.0 — ÉDITION MULTIVERS • 3 COMBATTANTS • EN LIGNE</div>
   </div>
 
   <!-- SÉLECTION -->
@@ -105,7 +112,7 @@
     <div class="notes l" id="notes0"></div><div class="notes r" id="notes1"></div>
     <div id="banner"><div class="bm"></div><div class="bs"></div></div>
     <div id="finishBox"></div>
-    <div id="trainPanel"></div><div id="trainHelp"></div>
+    <div id="trainPanel"></div><div id="trainHelp"></div><div id="tutBox"></div><div id="netInfo"></div>
     <div class="bub l" id="bub0"></div><div class="bub r" id="bub1"></div>
     <div id="perf"></div>
   </div>
@@ -117,31 +124,48 @@
     <div id="pauseMoves" class="hidden" style="margin-top:10px;font:600 14px/1.5 Rajdhani;text-align:left">
       <b style="color:#f0abfc">AURÉLIA</b> — Éclipse des Mille Lames d'Ombre : ↓ → ↓ + Rapide • Surcharge Neuro-Vortex : → ↓ → + Lourd<br>
       <b style="color:#67e8f9">HAÏ</b> — Jugement de la Merkabah Quantique : ↓ ↓ → + Rapide • Effacement du Code Source : ← → ↓ + Lourd<br>
-      <b style="color:#fbbf24">STAGE FATALITY</b> : ↑ ↑ ↓ + Spécial • <b style="color:#fdba74">BRUTALITY</b> : finir au Spécial/EX/X-Ray<br>Raccourcis : J1 1/2/3 — J2 8/9/0 • Provocation : J1 C — J2 . / N • Parade parfaite : ↓ au dernier moment</div></div></div>
+      <b style="color:#c084fc">L'ŒIL QUANTIQUE</b> — Réécriture de l'Existence : ↓ ← → + Rapide • Le Regard de l'Horizon : ← ← → + Lourd<br>
+      <b style="color:#fbbf24">STAGE FATALITY</b> : ↑ ↑ ↓ + Spécial • <b style="color:#fdba74">BRUTALITY</b> : finir au Spécial/EX/X-Ray<br>
+      <b style="color:#f9a8d4">FRIENDSHIP</b> : Aurélia ← ← ↓ • Haï ↓ ← ← • Œil ↓ ↓ ↑ (+ Provocation) • <b style="color:#86efac">ANIMALITY</b> : Aurélia → ← → • Haï ↓ → → • Œil → → ↓ (+ Lourd)<br>Raccourcis : J1 1/2/3/4/5 — J2 8/9/0/-/= • Provocation : J1 C — J2 . / N • Parade parfaite : ↓ au dernier moment</div>
+    <button class="mbtn hidden" id="pClip">🎞 Enregistrer le clip (10 s)</button></div></div>
   <div id="results" class="ovl"><div class="box"></div></div>
   <div id="gallery" class="ovl"><div class="panel full"><div class="ptag">LA KRYPTE</div><div class="ptitle">GALERIE</div>
     <div class="tabs" id="galTabs"><button class="btn" data-t="vid">🎬 Vidéos cinématiques</button><button class="btn" data-t="cine">Cinématiques &amp; Fins</button><button class="btn" data-t="fat">Fatalities &amp; X-Ray</button><button class="btn" data-t="art">Artworks, Postures &amp; Arènes</button><button class="btn" data-close style="float:right">✕ Fermer</button></div>
     <div class="gal" id="galGrid"></div></div></div>
   <div id="options" class="ovl"><div class="box" style="width:760px"><div class="ptitle">OPTIONS</div><div id="optList" style="margin:10px 0"></div><button class="mbtn" data-close>◂ Retour</button></div></div>
   <div id="moves" class="ovl"><div class="panel full"><div class="ptitle">COMMANDES &amp; COUPS <button class="btn" data-close style="float:right">✕ Fermer</button></div><div class="mvl" id="mvList" style="margin-top:10px"></div></div></div>
+  <div id="krypt" class="ovl"><div class="panel full"><div class="ptag">LA KRYPTE</div><div class="ptitle">DÉBLOCAGES <span class="kbal" id="kBal"></span> <button class="btn" data-close style="float:right">✕ Fermer</button></div>
+    <div class="kcheat"><span>Code secret :</span><input id="kCode" maxlength="16" autocomplete="off" spellcheck="false" placeholder="……"><button class="btn" id="kCodeGo">Valider</button><span id="kCodeMsg"></span></div>
+    <div class="kgrid" id="kGrid"></div><div id="kCost"></div></div></div>
+  <div id="trophies" class="ovl"><div class="panel full"><div class="ptag">SUCCÈS</div><div class="ptitle">TROPHÉES &amp; CLASSEMENTS <button class="btn" data-close style="float:right">✕ Fermer</button></div><div id="trList"></div></div></div>
+  <div id="tower" class="ovl"><div class="panel full"><div class="ptag">10 COMBATS</div><div class="ptitle">TOUR DES DÉFIS <button class="btn" data-close style="float:right">✕ Fermer</button></div><div id="twBody"></div></div></div>
+  <div id="online" class="ovl"><div class="panel full"><div class="ptag">WEBRTC P2P</div><div class="ptitle">DUEL EN LIGNE <button class="btn" id="onClose" style="float:right">✕ Fermer</button></div><div id="onBody"></div></div></div>
   <div id="viewer"></div>
 </div></div>
 
-<script src="js/assets.js?v=b60613aa34"></script>
-<script src="js/voices.js?v=e29efb6170"></script>
-<script src="js/audio.js?v=78acede58f"></script>
-<script src="js/data.js?v=099a3b5fdc"></script>
-<script src="js/fx.js?v=117f94fe2f"></script>
+<script src="js/assets.js?v=5c7c65bcb8"></script>
+<script src="js/voices.js?v=bafe4b2656"></script>
+<script src="js/audio.js?v=0d81ff3e03"></script>
+<script src="js/data.js?v=586905f7d3"></script>
+<script src="js/fx.js?v=76a8e3ef06"></script>
 <script src="js/video.js?v=893709ad3f"></script>
-<script src="js/game_core.js?v=09674fb91c"></script>
-<script src="js/game_ai.js?v=eb24b059f7"></script>
-<script src="js/game_fin.js?v=f7ed48390b"></script>
-<script src="js/game_fin2.js?v=4393576d47"></script>
-<script src="js/game_render.js?v=bd2d6868cc"></script>
-<script src="js/input.js?v=4c5a0d43e8"></script>
-<script src="js/ui_hud.js?v=a6855c1108"></script>
-<script src="js/ui_cine.js?v=61ea85d4b5"></script>
-<script src="js/ui_screens.js?v=b8733a3c43"></script>
-<script src="js/main.js?v=21ae2af6f0"></script>
+<script src="js/game_core.js?v=943ede9b6f"></script>
+<script src="js/game_ai.js?v=5aa9358c33"></script>
+<script src="js/game_fin.js?v=8563420d02"></script>
+<script src="js/game_fin2.js?v=82b21403c5"></script>
+<script src="js/game_render.js?v=dfd19c87ec"></script>
+<script src="js/input.js?v=24c4fdfcd8"></script>
+<script src="js/ui_hud.js?v=64fdec2b4a"></script>
+<script src="js/ui_cine.js?v=a05ed4d582"></script>
+<script src="js/ui_screens.js?v=96895ec303"></script>
+<script src="js/i18n_subs.js?v=a9c3e17c95"></script>
+<script src="js/i18n.js?v=855ff18813"></script>
+<script src="js/progress.js?v=551a6e2575"></script>
+<script src="js/game_fin3.js?v=b42de5c04e"></script>
+<script src="js/modes.js?v=199606b8cf"></script>
+<script src="js/online.js?v=2b8b7c8195"></script>
+<script src="js/replay.js?v=a8f8ff56b7"></script>
+<script src="js/main.js?v=47c5826127"></script>
+<script src="js/pwa.js?v=cbe614a821"></script><!--web-only-->
 </body>
 </html>
