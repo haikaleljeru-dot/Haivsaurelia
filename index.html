@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>AURÉLIA vs HAÏ — Mortal Kombat : La Fracture du Multivers</title>
+<meta name="description" content="Jeu de combat Mortal Kombat fan-made dans le navigateur : Aurélia vs Haï. Voix françaises, cinématiques vidéo, X-Ray, Fatalities, Mode Histoire, 2 joueurs, manette et tactile.">
+<meta name="theme-color" content="#12061f">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://haikaleljeru-dot.github.io/Haivsaurelia/">
+<meta property="og:url" content="https://haikaleljeru-dot.github.io/Haivsaurelia/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Aurélia vs Haï">
+<meta property="og:title" content="AURÉLIA vs HAÏ — Mortal Kombat : La Fracture du Multivers">
+<meta property="og:description" content="Jeu de combat Mortal Kombat fan-made dans le navigateur : Aurélia vs Haï. Voix françaises, cinématiques vidéo, X-Ray, Fatalities, Mode Histoire, 2 joueurs, manette et tactile.">
+<meta property="og:image" content="https://haikaleljeru-dot.github.io/Haivsaurelia/assets/og/og_cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AURÉLIA vs HAÏ — Mortal Kombat">
+<meta name="twitter:description" content="Jeu de combat Mortal Kombat fan-made dans le navigateur : Aurélia vs Haï. Voix françaises, cinématiques vidéo, X-Ray, Fatalities, Mode Histoire, 2 joueurs, manette et tactile.">
+<meta name="twitter:image" content="https://haikaleljeru-dot.github.io/Haivsaurelia/assets/og/og_cover.jpg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aurélia vs Haï">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><radialGradient id='g' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23000'/><stop offset='.62' stop-color='%23000'/><stop offset='.72' stop-color='%2322d3ee'/><stop offset='.86' stop-color='%23a855f7'/><stop offset='1' stop-color='%2312061f'/></radialGradient></defs><rect width='64' height='64' rx='14' fill='%2312061f'/><circle cx='32' cy='32' r='26' fill='url(%23g)'/><circle cx='32' cy='32' r='16' fill='%23000' stroke='%23d946ef' stroke-width='2'/><path d='M20 44 32 18 44 44' fill='none' stroke='%2367e8f9' stroke-width='4' stroke-linejoin='round'/><path d='M25 36h14' stroke='%23fbbf24' stroke-width='3'/></svg>">
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png"><!--web-only-->
+<link rel="manifest" href="manifest.webmanifest"><!--web-only-->
+<link rel="stylesheet" href="css/fonts.css?v=9fb5b118db">
+<link rel="stylesheet" href="css/style.css?v=de14dfc1f2">
+</head>
+<body>
+<noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;color:#fbbf24;font:700 20px sans-serif;text-align:center;padding:20px">JavaScript est requis pour jouer à Aurélia vs Haï.</div></noscript>
+<div id="wrap"><div id="stage">
+  <canvas id="cv" width="1280" height="720" role="img" aria-label="Arène de combat Aurélia contre Haï"></canvas>
+
+  <!-- DÉMARRAGE -->
+  <div id="boot" class="layer on">
+    <div class="logo">AURÉLIA <span style="font-size:30px">vs</span> HAÏ</div>
+    <div class="bar"><i></i></div><div class="txt">CHARGEMENT DU MULTIVERS…</div>
+    <div class="press">▶ APPUYEZ POUR ENTRER DANS L'ARÈNE</div>
+    <div class="warn">Son recommandé 🔊 (voix VF d'Aurélia &amp; Haï) • Clavier AZERTY / QWERTY • Manette • Tactile</div>
+  </div>
+
+  <!-- TITRE -->
+  <div id="title" class="layer">
+    <div class="logoBox">
+      <div class="kicker">MORTAL KOMBAT • ÉDITION MULTIVERS</div>
+      <h1>AURÉLIA<em>VS</em><span>HAÏ</span></h1>
+      <div class="sub">LA FRACTURE DU MULTIVERS</div>
+    </div>
+    <div class="menu">
+      <button class="mbtn gold" data-m="story">Mode Histoire<small>Campagne en 3 arènes • cinématiques • fins uniques</small></button>
+      <button class="mbtn" data-m="vs">Duel contre l'IA<small>Novice • Guerrier • Maître • Cauchemar</small></button>
+      <button class="mbtn" data-m="duo">2 Joueurs local<small>Même clavier ou manettes</small></button>
+      <button class="mbtn" data-m="train">Entraînement &amp; Démo Fatality<small>Mannequin, super infini, toutes les fatalities</small></button>
+      <button class="mbtn" data-m="intro">Cinématique d'intro<small>La Fracture du Multivers — vidéo &amp; voix VF</small></button>
+      <button class="mbtn" data-m="gal">Galerie &amp; Krypte<small>Vidéos cinématiques, fins, fatalities, artworks</small></button>
+      <button class="mbtn" data-m="mv">Commandes &amp; Coups</button>
+      <button class="mbtn" data-m="opt">Options</button>
+    </div>
+    <div class="hint">↑↓ naviguer • Entrée valider • Échap retour • 🎮 compatible manette</div>
+    <div class="ver">v3.0 — ÉDITION ULTRA • VIDÉOS • VOIX VF</div>
+  </div>
+
+  <!-- SÉLECTION -->
+  <div id="select" class="layer">
+    <div class="head"><div class="ptag" id="selMode">SÉLECTION</div><div class="ptitle">CHOISIS TON COMBATTANT</div></div>
+    <div class="card" id="card_aurelia" style="left:50px"></div>
+    <div class="card" id="card_hai" style="left:830px"></div>
+    <div class="mid panel">
+      <div id="selStoryBox"><h3>CAMPAGNE</h3><div style="font:500 14px/1.35 Rajdhani;color:#d6cce6">Intro « La Fracture du Multivers » → Cyber-Paris → Néo-Jérusalem → la Singularité → fin propre à ton personnage. 2 rounds gagnants par arène.</div></div>
+      <div id="selStageBox"><h3>ARÈNE</h3><div class="stagePrev" id="stagePrev"><span></span></div><div id="selStages"></div></div>
+      <div id="selDiffBox"><h3>DIFFICULTÉ IA</h3><div id="selDiffs"></div></div>
+      <h3>PORTRAITS</h3><div id="selPortrait"><button class="btn" data-v="cyber">Cyber</button><button class="btn" data-v="real">Réels</button></div>
+      <h3>SPRITES</h3><div id="selOutfit"><button class="btn" data-v="hd">HD 2026</button><button class="btn" data-v="v1">Originaux</button></div>
+      <h3>TEMPS / ROUND</h3><div id="selTime"><button class="btn" data-v="60">60</button><button class="btn" data-v="99">99</button><button class="btn" data-v="999">∞</button></div>
+    </div>
+    <div class="foot"><button class="btn" id="selBack">◂ Retour</button><button class="mbtn gold" id="selGo" style="display:inline-block;width:300px;text-align:center">COMBATTRE ▸</button></div>
+  </div>
+
+  <!-- VS -->
+  <div id="vs" class="layer"></div>
+
+  <!-- CINÉMATIQUE -->
+  <div id="cine" class="layer">
+    <div class="bars"></div><div class="ttl"></div>
+    <div class="chap"></div><div class="subs"></div>
+    <div class="ctl" id="cineCtl"><button class="btn" data-c="prev">◂◂</button><button class="btn" data-c="pause">❚❚ Pause</button><button class="btn" data-c="next">▸▸</button><button class="btn" data-c="replay">↺ Rejouer</button><button class="btn" data-c="skip">Passer ▸|</button></div>
+    <div class="prog"></div>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud" class="layer">
+    <div class="hs l"><div class="xrb"></div><div class="vw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="dgr">⚠ DANGER</div><div class="pf"></div><div class="nm"></div><div class="hp"><i class="red"></i><i class="fill"></i><i class="shine"></i></div><div class="gd"><i></i></div><div class="seals"></div>
+      <div class="mt"><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="lab">SUPER</div></div></div>
+    <div class="hs r"><div class="xrb"></div><div class="vw"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="dgr">⚠ DANGER</div><div class="pf"></div><div class="nm"></div><div class="hp"><i class="red"></i><i class="fill"></i><i class="shine"></i></div><div class="gd"><i></i></div><div class="seals"></div>
+      <div class="mt"><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="seg"><i></i></div><div class="lab">SUPER</div></div></div>
+    <div id="timer">99</div><div id="rlabel"></div>
+    <div class="combo l" id="combo0"></div><div class="combo r" id="combo1"></div>
+    <div class="notes l" id="notes0"></div><div class="notes r" id="notes1"></div>
+    <div id="banner"><div class="bm"></div><div class="bs"></div></div>
+    <div id="finishBox"></div>
+    <div id="trainPanel"></div><div id="trainHelp"></div>
+    <div class="bub l" id="bub0"></div><div class="bub r" id="bub1"></div>
+    <div id="perf"></div>
+  </div>
+  <div id="touch"></div>
+
+  <!-- OVERLAYS -->
+  <div id="pause" class="ovl"><div class="box"><div class="ptitle">PAUSE</div><div style="margin-top:14px">
+    <button class="mbtn gold" id="pResume">Reprendre</button><button class="mbtn" id="pRestart">Recommencer</button><button class="mbtn" id="pMoves">Codes des fatalities</button><button class="mbtn" id="pFull">Plein écran ⛶</button><button class="mbtn" id="pQuit">Quitter vers le menu</button></div>
+    <div id="pauseMoves" class="hidden" style="margin-top:10px;font:600 14px/1.5 Rajdhani;text-align:left">
+      <b style="color:#f0abfc">AURÉLIA</b> — Éclipse des Mille Lames d'Ombre : ↓ → ↓ + Rapide • Surcharge Neuro-Vortex : → ↓ → + Lourd<br>
+      <b style="color:#67e8f9">HAÏ</b> — Jugement de la Merkabah Quantique : ↓ ↓ → + Rapide • Effacement du Code Source : ← → ↓ + Lourd<br>
+      <b style="color:#fbbf24">STAGE FATALITY</b> : ↑ ↑ ↓ + Spécial • <b style="color:#fdba74">BRUTALITY</b> : finir au Spécial/EX/X-Ray<br>Raccourcis : J1 1/2/3 — J2 8/9/0 • Provocation : J1 C — J2 . / N • Parade parfaite : ↓ au dernier moment</div></div></div>
+  <div id="results" class="ovl"><div class="box"></div></div>
+  <div id="gallery" class="ovl"><div class="panel full"><div class="ptag">LA KRYPTE</div><div class="ptitle">GALERIE</div>
+    <div class="tabs" id="galTabs"><button class="btn" data-t="vid">🎬 Vidéos cinématiques</button><button class="btn" data-t="cine">Cinématiques &amp; Fins</button><button class="btn" data-t="fat">Fatalities &amp; X-Ray</button><button class="btn" data-t="art">Artworks, Postures &amp; Arènes</button><button class="btn" data-close style="float:right">✕ Fermer</button></div>
+    <div class="gal" id="galGrid"></div></div></div>
+  <div id="options" class="ovl"><div class="box" style="width:760px"><div class="ptitle">OPTIONS</div><div id="optList" style="margin:10px 0"></div><button class="mbtn" data-close>◂ Retour</button></div></div>
+  <div id="moves" class="ovl"><div class="panel full"><div class="ptitle">COMMANDES &amp; COUPS <button class="btn" data-close style="float:right">✕ Fermer</button></div><div class="mvl" id="mvList" style="margin-top:10px"></div></div></div>
+  <div id="viewer"></div>
+</div></div>
+
+<script src="js/assets.js?v=b60613aa34"></script>
+<script src="js/voices.js?v=e29efb6170"></script>
+<script src="js/audio.js?v=78acede58f"></script>
+<script src="js/data.js?v=099a3b5fdc"></script>
+<script src="js/fx.js?v=117f94fe2f"></script>
+<script src="js/video.js?v=893709ad3f"></script>
+<script src="js/game_core.js?v=09674fb91c"></script>
+<script src="js/game_ai.js?v=eb24b059f7"></script>
+<script src="js/game_fin.js?v=f7ed48390b"></script>
+<script src="js/game_fin2.js?v=4393576d47"></script>
+<script src="js/game_render.js?v=bd2d6868cc"></script>
+<script src="js/input.js?v=4c5a0d43e8"></script>
+<script src="js/ui_hud.js?v=a6855c1108"></script>
+<script src="js/ui_cine.js?v=61ea85d4b5"></script>
+<script src="js/ui_screens.js?v=b8733a3c43"></script>
+<script src="js/main.js?v=21ae2af6f0"></script>
+</body>
+</html>
