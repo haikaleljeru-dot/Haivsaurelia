@@ -298,3 +298,108 @@ html[data-mode=fight] .fsbtn,html[data-mode=cine] .fsbtn,html[data-mode=vs] .fsb
 #stage.touchon #trainPanel{max-height:318px;overflow-y:auto;overscroll-behavior:contain;width:220px}
 #stage.touchon #trainHelp{max-height:318px;overflow-y:auto}
 #stage.touchon #perf{top:156px}
+/* ===================== v4 — MULTIVERS : 3 combattants, Krypte, Tour, En ligne, i18n ===================== */
+#title .menu{width:880px;display:grid;grid-template-columns:1fr 1fr;column-gap:20px;top:190px}
+#title .menu .mbtn{margin:4px 0;padding:6px 18px;font-size:17px}
+#title .menu .mbtn small{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.langSel{position:absolute;right:20px;top:106px;display:flex;gap:6px;z-index:3}
+.langSel .btn{padding:5px 10px;font:700 12px 'Orbitron';min-width:44px}
+.langSel .btn.sel{background:var(--aur2);color:#fff;border-color:var(--gold)}
+.koinTag{position:absolute;right:20px;top:62px;padding:6px 12px;font:700 14px 'Orbitron';letter-spacing:.08em;color:#fde68a;background:rgba(20,10,0,.6);border:1px solid rgba(251,191,36,.45)}
+.koinTag:empty{display:none}
+.dim{color:#a99ac4;font:500 14px/1.4 'Rajdhani'}
+.lockd{opacity:.45;filter:grayscale(.8)}
+/* sélection : roster + costumes */
+#select .card .roster{position:absolute;top:52px;left:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;z-index:2}
+.rch{border-color:var(--c,#a855f7)!important;font:700 12px 'Orbitron'!important;letter-spacing:.06em;padding:5px 9px!important}
+.rch.sel{background:color-mix(in srgb,var(--c,#a855f7) 55%,transparent)!important;color:#fff;box-shadow:0 0 12px var(--c,#a855f7)}
+.csRow{margin-top:6px;font:700 12px 'Orbitron';letter-spacing:.06em;color:#fde68a}
+.csb{font:700 11px 'Rajdhani'!important;padding:3px 7px!important;margin:2px!important}
+.csb.sel{background:rgba(251,191,36,.35)!important;border-color:var(--gold)!important}
+/* costumes alternatifs : filtres de portraits / vignettes */
+.cs_soiree{filter:hue-rotate(95deg) saturate(1.25) brightness(.95)}
+.cs_armure{filter:sepia(.6) hue-rotate(-12deg) saturate(1.6) brightness(1.05)}
+.cs_solaire{filter:sepia(.75) hue-rotate(5deg) saturate(1.9) brightness(1.1)}
+.cs_mirror{filter:hue-rotate(160deg) saturate(1.1)}
+/* Krypte */
+.kbal{font:700 18px 'Orbitron';color:#fde68a;margin-left:14px;vertical-align:middle}
+.kcheat{display:flex;align-items:center;gap:8px;margin:8px 0;font:600 15px 'Rajdhani'}
+.kcheat input,#onBody input,#onBody textarea{background:#12061f;border:1px solid #5b3a8a;color:#fff;font:700 15px 'Orbitron';padding:6px 10px;letter-spacing:.15em;outline:none;user-select:text}
+.kcheat input:focus,#onBody input:focus,#onBody textarea:focus{border-color:var(--gold)}
+#kCodeMsg{font:700 14px 'Orbitron';color:#fde68a}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;height:440px;overflow-y:auto;padding-right:6px}
+.kit{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);background:rgba(12,6,24,.7);min-height:208px}
+.kit .th{height:110px;background-size:cover;background-position:center 25%}
+.kit .tx{padding:6px 8px;flex:1}.kit .tx b{display:block;font:700 14px 'Rajdhani';color:#fff}.kit .tx span{font:500 12px/1.25 'Rajdhani';color:#b9a8d8}
+.kit .btn{margin:0 8px 8px;font:700 13px 'Orbitron'}
+.kit.own{border-color:rgba(34,197,94,.6)}.kit.own .btn{color:#86efac}
+.btn.gold{border-color:var(--gold);color:#fde68a}
+#kCost{margin-top:8px;font:600 13px/1.4 'Rajdhani';color:#d6cce6}
+/* Trophées */
+#trList{height:560px;overflow-y:auto;padding-right:6px}
+.trGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tr{position:relative;padding:8px 10px 8px 46px;border:1px solid var(--line);background:rgba(12,6,24,.6);min-height:62px;opacity:.6}
+.tr.ok{opacity:1;border-color:rgba(251,191,36,.55);box-shadow:inset 0 0 18px rgba(251,191,36,.12)}
+.tr i{position:absolute;left:10px;top:10px;font-style:normal;font-size:24px}
+.tr b{display:block;font:700 14px 'Rajdhani';color:#fff}.tr span{font:500 12px/1.2 'Rajdhani';color:#b9a8d8}.tr small{display:block;font:500 10px 'Orbitron';color:#fde68a;margin-top:2px}
+.lbs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:14px}
+.lbs h3{font:900 18px 'Cinzel';margin:4px 0 6px}
+.lbs table{width:100%;border-collapse:collapse;font:600 13px 'Rajdhani'}.lbs td{padding:3px 5px;border-bottom:1px solid var(--line)}
+/* Tour */
+#twBody{height:590px;overflow-y:auto;padding-right:6px}
+.twTop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}
+.twTop .mbtn{display:inline-block;width:auto;margin:0 6px;text-align:center}
+.twList{display:flex;flex-direction:column;gap:5px}
+.twf{display:grid;grid-template-columns:44px 1fr 220px 190px 30px;align-items:center;gap:10px;padding:6px 10px;border:1px solid var(--line);background:rgba(12,6,24,.6);opacity:.7}
+.twf b{font:900 22px 'Orbitron';color:#a78bfa;text-align:center}
+.twf .twn span{display:block;font:700 16px 'Rajdhani';color:#fff}.twf small{display:block;font:500 12px 'Rajdhani';color:#b9a8d8}
+.twf .twv{font:700 13px 'Orbitron'}.twf .twr{font:700 13px 'Rajdhani';color:#fde68a}.twf .twc{font-size:18px;text-align:center}
+.twf.done{opacity:.95;border-color:rgba(34,197,94,.5)}.twf.done b{color:#86efac}
+.twf.cur{opacity:1;border-color:var(--gold);box-shadow:0 0 18px rgba(251,191,36,.25)}
+/* En ligne */
+#onBody{height:590px;overflow-y:auto}
+.onCols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:12px 0}
+.onCard{padding:12px 14px;border:1px solid var(--line);background:rgba(12,6,24,.65)}
+.onCard h3{font:900 18px 'Cinzel';margin-bottom:6px}.onCard p{font:500 14px/1.35 'Rajdhani';color:#d6cce6;margin-bottom:8px}.onCard p.big{font:700 20px 'Orbitron';color:#fff}
+.onCard .mbtn{text-align:center}
+.onCard .btn{margin:3px 3px 3px 0}
+#onBody input{width:100%;margin:4px 0}
+#onBody textarea{width:100%;height:110px;margin:6px 0;font:500 11px monospace;letter-spacing:0;resize:none}
+.onCode{font:900 40px 'Orbitron';letter-spacing:.3em;color:#fde68a;text-align:center;margin:8px 0;text-shadow:0 0 18px rgba(251,191,36,.5)}
+.onStatus{min-height:22px;font:700 15px 'Rajdhani';color:#c4b5fd;text-align:center}
+.onStatus.ok{color:#86efac}.onStatus.err{color:#fca5a5}
+#netInfo{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:4px 12px;font:600 12px 'Rajdhani';background:rgba(0,0,0,.6);border:1px solid rgba(34,211,238,.35);display:none;z-index:6;white-space:nowrap}
+#netInfo.on{display:block}
+/* Tutoriel */
+#tutBox{position:absolute;left:50%;top:104px;transform:translateX(-50%);width:640px;padding:10px 16px;background:rgba(8,4,22,.86);border:1px solid var(--gold);box-shadow:0 0 30px rgba(251,191,36,.25);display:none;z-index:7;pointer-events:auto}
+#tutBox.on{display:block}
+.tutProg{display:flex;gap:4px;margin-bottom:6px}.tutProg i{flex:1;height:5px;background:#2a1a44}.tutProg i.ok{background:#22c55e}.tutProg i.cur{background:var(--gold)}
+.tutH{font:900 16px 'Orbitron';letter-spacing:.1em;color:#fde68a}.tutH b{color:#fff;margin-left:6px}
+.tutD{font:600 15px/1.4 'Rajdhani';color:#f3e8ff;margin:4px 0}
+.tutOk{font:900 18px 'Orbitron';color:#86efac}
+.tutBtns{text-align:right}.tutBtns .btn{font-size:11px;padding:4px 9px}.tutBtns .mbtn{display:inline-block;width:auto;margin-right:8px}
+/* toasts trophées / koins */
+#achBox{position:absolute;right:16px;top:150px;display:flex;flex-direction:column;gap:8px;z-index:45;pointer-events:none;width:330px}
+.ach{padding:9px 12px;background:linear-gradient(90deg,rgba(40,20,0,.92),rgba(20,8,36,.92));border:1px solid var(--gold);box-shadow:0 0 22px rgba(251,191,36,.35);animation:achIn .35s both}
+.ach b{display:block;font:900 13px 'Orbitron';letter-spacing:.12em;color:#fde68a}.ach span{font:600 14px 'Rajdhani';color:#fff}
+.ach.unlock{border-color:#a855f7;box-shadow:0 0 22px rgba(168,85,247,.45)}
+.ach.out{animation:achOut .4s both}
+@keyframes achIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes achOut{to{opacity:0;transform:translateX(40px)}}
+.koinfx{position:absolute;right:30px;top:60px;font:900 20px 'Orbitron';color:#fde68a;text-shadow:0 0 14px rgba(251,191,36,.8);z-index:46;pointer-events:none;animation:koinUp 1.6s both}
+@keyframes koinUp{0%{opacity:0;transform:translateY(16px)}15%{opacity:1}100%{opacity:0;transform:translateY(-40px)}}
+.kwin{font:900 22px 'Orbitron';color:#fde68a;margin:6px 0;text-shadow:0 0 14px rgba(251,191,36,.6)}.kwin small{font:600 13px 'Rajdhani';color:#d6cce6}
+/* clip replay + mise à jour PWA */
+.clipBox{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:700px;padding:14px;background:rgba(8,4,22,.95);border:1px solid var(--gold);z-index:50;text-align:center}
+.clipBox video{width:100%;max-height:380px;background:#000}
+.clipBtns{margin:8px 0 4px}.clipBtns .btn{margin:0 4px;text-decoration:none;display:inline-block}
+.swUpd{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);padding:8px 12px;background:rgba(8,4,22,.95);border:1px solid #22d3ee;z-index:60;display:flex;gap:8px;align-items:center;font:700 14px 'Rajdhani'}
+/* FINISH : lignes Friendship / Animality */
+#finishBox{max-height:300px;overflow:hidden}
+#finishBox .fc{font-size:14px;margin:2px 0}
+/* RTL (hébreu) : panneaux et textes, le combat reste identique */
+#stage.rtl .ovl .panel,#stage.rtl .ovl .box,#stage.rtl #select .info,#stage.rtl #select .mid,#stage.rtl #tutBox,#stage.rtl .toast,#stage.rtl #title .menu,#stage.rtl #title .hint,#stage.rtl .dl,#stage.rtl #cine .subs,#stage.rtl .ach{direction:rtl}
+#stage.rtl .mbtn{text-align:right;border-left-width:1px;border-right:3px solid var(--aur2);clip-path:polygon(3% 0,100% 0,100% 100%,0 100%)}
+#stage.rtl .mbtn:hover,#stage.rtl .mbtn.focus,#stage.rtl .mbtn:focus{transform:translateX(-8px);border-right-color:var(--gold)}
+#stage.rtl .mvl td:last-child{text-align:left}
+#stage.rtl kbd,#stage.rtl .langSel{direction:ltr}

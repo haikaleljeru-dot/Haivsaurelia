@@ -20,7 +20,7 @@ function SeqHaiF1(att, vic) {
     if (t > 170 && t < 225) { vic.alpha = Math.max(0, 1 - (t - 170) / 50); vic.tint = "#ffffff"; Match.shake = 10; if (t % 2 === 0) burst(vic.x, vic.y - 150, pick(["#fbbf24", "#22d3ee", "#fff"]), 8, 10, "spark"); }
     if (t === 225) { vic.hidden = true; Match.flash = 1; Match.flashColor = "#fef3c7"; Match.shake = 30; Audio2.play("explode"); glyphBurst(vic.x, vic.y - 150, "#fbbf24", 60, HEB + BIN, 8); burst(vic.x, vic.y - 150, "#fde68a", 90, 14, "orb", { size: 3 }); ring(vic.x, vic.y - 150, "#22d3ee", 20, 18, 30, 10); }
     if (t > 225 && t < 320 && t % 3 === 0) emit({ x: vic.x + rnd(-90, 90), y: fl - rnd(200, 360), vy: rnd(0.5, 2), type: "glyph", ch: pick(HEB), color: "#fbbf24", size: 14, life: 60, drag: 1 });
-    if (t === 245) { panelArt(s, s.art, 245, FAT_PANEL, 1, "vid_fatality_hai"); speak(att, "fat", true); }
+    if (t === 245) { panelArt(s, s.art, 245, FAT_PANEL, 1, att.ch.fatVideo); speak(att, "fat", true); }
     if (t === 400) { UI.banner("FATALITY", s.name, "fatality", 170); Audio2.announce("fatality", "Fatality !", "ann_fatality"); }
     if (t >= 540) finishSeqDone(att, vic);
   };
@@ -60,7 +60,7 @@ function SeqHaiF2(att, vic) {
     if (t > 112 && t < 130) vic.y -= 4;
     if (t === 130) { s.tiles = makeTiles(vic, 11, "up"); vic.hidden = true; if (s.tiles) for (const tl of s.tiles.tiles) { tl.vx = rnd(-2, 2); tl.vy = -rnd(3, 9); } Audio2.play("shatter"); Audio2.play("glitch"); burst(vic.x, vic.y - 150, "#22d3ee", 80, 12, "pixel", { size: 5, g: -0.05 }); glyphBurst(vic.x, vic.y - 150, "#a5f3fc", 50, BIN, 7); UI.notify("DELETE", att.side, "xray"); }
     if (s.tiles) for (const tl of s.tiles.tiles) { if (tl.delay > 0) { tl.delay--; continue; } tl.ox += tl.vx; tl.oy += tl.vy; tl.vy -= 0.06; tl.rot += tl.vr; tl.a -= 0.01; }
-    if (t === 170) { panelArt(s, s.art, 170, FAT_PANEL, -1, "vid_fatality_hai"); speak(att, "fat", true); }
+    if (t === 170) { panelArt(s, s.art, 170, FAT_PANEL, -1, att.ch.fatVideo); speak(att, "fat", true); }
     if (t === 325) { UI.banner("FATALITY", "EFFACEMENT DU CODE SOURCE — SINGULARITY DELETE", "fatality", 170); Audio2.announce("fatality", "Fatality !", "ann_fatality"); }
     if (t >= 465) finishSeqDone(att, vic);
   };
@@ -89,7 +89,7 @@ function SeqBrutality(att, vic) {
       burst(vic.x, vic.y - 150, att.ch.color, 120, 16, "spark"); burst(vic.x, vic.y - 150, "#7f1d1d", 50, 12, "blood", { size: 4 }); ring(vic.x, vic.y - 150, "#fff", 10, 20, 26, 10);
     }
     if (s.tiles) for (const tl of s.tiles.tiles) { tl.vy += 0.5; tl.ox += tl.vx; tl.oy += tl.vy; tl.rot += tl.vr * 2; if (s.tiles.y + tl.ly + tl.oy > fl) { tl.oy = fl - s.tiles.y - tl.ly; tl.vy *= -0.3; tl.vx *= 0.7; tl.vr *= 0.5; } if (t > 120) tl.a -= 0.02; }
-    if (t === 55) { UI.banner("BRUTALITY", att.id === "aurelia" ? "SURCHARGE D'OMBRE" : "SURCHARGE QUANTIQUE", "brutality", 150); Audio2.announce("fatality", "Brutality !", "ann_brutality"); }
+    if (t === 55) { UI.banner("BRUTALITY", att.id === "aurelia" ? "SURCHARGE D'OMBRE" : att.id === "eye" ? "SURCHARGE COSMIQUE" : "SURCHARGE QUANTIQUE", "brutality", 150); Audio2.announce("fatality", "Brutality !", "ann_brutality"); }
     if (t >= 215) finishSeqDone(att, vic);
   };
   s.drawTop = (ctx) => drawTiles(ctx, s.tiles);
@@ -201,7 +201,7 @@ function startXray(att, vic) {
     if (s.xr > 0) { const info = spriteInfo(vic); if (info) { drawFighterRaw(ctx, vic, info, vic.x, vic.y, { tint: "#a5f3fc", alpha: 0.85 }); ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(255,255,255,0.45)"; ctx.lineWidth = 1; for (let y = vic.y - info.h; y < vic.y; y += 6) { ctx.beginPath(); ctx.moveTo(vic.x - 120, y); ctx.lineTo(vic.x + 120, y); ctx.stroke(); } ctx.restore(); } }
   };
   s.drawScreen = (ctx) => {
-    const t = s.t, img = IMG[att.id === "aurelia" ? "xray_aurelia" : "xray_hai"]; if (!img || !img.naturalWidth) return;
+    const t = s.t, img = IMG[att.ch.xrayImg]; if (!img || !img.naturalWidth) return;
     const k = t < 16 ? easeOut(t / 16) : t > 134 ? easeOut((150 - t) / 16) : 1, side = att.side ? 1 : -1;
     ctx.save(); ctx.translate(side * (1 - k) * W, 0);
     const x0 = att.side ? W * 0.42 : 0, x1 = att.side ? W : W * 0.58;

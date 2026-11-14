@@ -55,7 +55,9 @@ function fightStep() {
       UI.finishTimer(Math.max(0, 10 - Math.floor(Match.st / 60)));
       if (Match.st > 600) { const v = Match.loser; Match.finisher = "ko"; setState(v, "juggle"); v.vy = -4; v.forceSprite = null; endRound(Match.winner, v, "ko"); }
     }
-    Audio2.setIntensity(1 - Math.min(a.hp, b.hp) / 100 + (Match.round - 1) * 0.15);
+    // intensité musicale : PV bas, round avancé, combos en cours, chrono serré
+    const cmb = Math.max(a.combo || 0, b.combo || 0), tl = Match.roundTime < 999 && Match.timer <= 15 ? 0.2 : 0;
+    Audio2.setIntensity(1 - Math.min(a.hp, b.hp) / 100 + (Match.round - 1) * 0.15 + Math.min(0.35, cmb * 0.06) + tl);
   }
 }
 
@@ -104,8 +106,10 @@ function drawFighter(ctx, f) {
   if (f.state === "guard" || f.state === "blockstun") {
     const a = 0.45 + f.guard / 200, gx = f.x + f.face * 70, gy = f.y - 160;
     if (f.id === "hai") drawSeal(ctx, gx, gy, 95, frameCount * 0.05, "#22d3ee", "#fbbf24", a * (f.state === "blockstun" ? 1.3 : 1), 1, true);
+    else if (f.id === "eye") drawPrismShield(ctx, gx, gy, 115, a * (f.state === "blockstun" ? 1.3 : 1), frameCount, f.guard < 35);
     else drawHexShield(ctx, gx, gy, 120, a, "#d946ef", frameCount, f.guard < 35 ? 1 : 0);
   }
+  if (f.id === "eye") drawEyeHalo(ctx, f, info, x, y, rot, sx, sy);
   ctx.save(); ctx.globalAlpha = f.alpha;
   const rim = tinted(info.key, f.ch.color);
   if (rim) { ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = 0.2 * f.alpha; for (const [ox, oy] of [[-3, 0], [3, 0], [0, -3]]) { ctx.save(); ctx.translate(x + ox, y + oy); ctx.rotate(rot); ctx.scale(f.face * info.flip * sx, sy); ctx.drawImage(rim, -info.w * info.ax, -info.h, info.w, info.h); ctx.restore(); } ctx.restore(); }
@@ -115,16 +119,43 @@ function drawFighter(ctx, f) {
   if (f.flash > 0) { const wc = tinted(info.key, "#ffffff"); if (wc) { ctx.globalAlpha = Math.min(1, f.flash / 4) * 0.85; ctx.drawImage(wc, -info.w * info.ax, -info.h, info.w, info.h); } }
   if (f.state === "stun" || f.state === "dizzy") { ctx.globalAlpha = 0.22 + 0.14 * Math.sin(frameCount * 0.3); const yc = tinted(info.key, "#fde047"); if (yc) ctx.drawImage(yc, -info.w * info.ax, -info.h, info.w, info.h); }
   ctx.restore();
-  if (Settings.portrait === "real" && !["down", "ko", "juggle", "fatality_v"].includes(f.state)) {
-    const pi = IMG[f.id === "aurelia" ? "aur_real" : "hai_real"];
+  if (Settings.portrait === "real" && f.id !== "eye" && !["down", "ko", "juggle", "fatality_v"].includes(f.state)) {
+    const pi = IMG[f.ch.portraits.real];
     if (pi && pi.naturalWidth) { const r = 22, py = f.y - info.h - 30; ctx.save(); ctx.beginPath(); ctx.arc(f.x, py, r, 0, Math.PI * 2); ctx.closePath(); ctx.strokeStyle = f.ch.color; ctx.lineWidth = 3; ctx.shadowColor = f.ch.color; ctx.shadowBlur = 10; ctx.stroke(); ctx.clip(); ctx.drawImage(pi, f.x - r, py - r, r * 2, r * 2.15); ctx.restore(); }
   }
+}
+// ---------- L'Œil Quantique : halo d'or procédural en rotation derrière la tête ----------
+function drawEyeHalo(ctx, f, info, x, y, rot, sx, sy) {
+  if (f.hidden || f.alpha <= 0.05 || ["down", "ko", "juggle"].includes(f.state)) return;
+  const m = f.ch.spriteMeta[COSTUME_BASE[info.key] || info.key] || {}, hx = (m.hx == null ? 0.5 : m.hx), hy = (m.hy == null ? 0.06 : m.hy);
+  const lx = (hx - info.ax) * info.w, ly = -info.h + hy * info.h + info.h * 0.05;
+  const gold = f.costume === "solaire" ? "#fff7d6" : "#fbbf24";
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(f.face * info.flip * sx, sy); ctx.translate(lx, ly);
+  ctx.globalAlpha = f.alpha; ctx.globalCompositeOperation = "lighter";
+  const R = 46 * f.scale, s = R * 3.4; ctx.drawImage(glowSprite("#f59e0b"), -s / 2, -s / 2, s, s);
+  ctx.rotate(frameCount * 0.02); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.shadowColor = gold; ctx.shadowBlur = 14;
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1.5; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.arc(0, 0, R * 1.22, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = gold; ctx.font = `700 ${Math.round(11 * f.scale)}px serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (let i = 0; i < 12; i++) { ctx.save(); ctx.rotate(i / 12 * Math.PI * 2); ctx.fillText(SACRED[i % SACRED.length], 0, -R * 1.11); ctx.restore(); }
+  ctx.restore();
+}
+// Bouclier prismatique (garde de l'Œil Quantique)
+function drawPrismShield(ctx, x, y, r, a, t, crack) {
+  ctx.save(); ctx.translate(x, y); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a);
+  for (let k = 0; k < 2; k++) {
+    ctx.save(); ctx.rotate((k ? -1 : 1) * t * 0.03 + k * Math.PI); ctx.strokeStyle = k ? "#fbbf24" : "#c084fc"; ctx.fillStyle = k ? "rgba(251,191,36,0.07)" : "rgba(168,85,247,0.12)"; ctx.lineWidth = 3;
+    ctx.beginPath(); for (let i = 0; i < 3; i++) { const an = i / 3 * Math.PI * 2 - Math.PI / 2; ctx[i ? "lineTo" : "moveTo"](Math.cos(an) * r, Math.sin(an) * r); } ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+  }
+  const s = r * 2.2; ctx.globalAlpha = a * 0.5; ctx.drawImage(glowSprite("#a855f7"), -s / 2, -s / 2, s, s);
+  if (crack) { ctx.globalAlpha = a; ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(i * 1.7) * r * 0.8, Math.sin(i * 1.7) * r * 0.8); ctx.stroke(); } }
+  ctx.restore();
 }
 // ---------- Reflets & auras technologiques au sol (par arène) ----------
 function drawGroundAura(ctx, f, info, fl, hgt) {
   if (QUALITY.level === "basse" || f.hidden) return;
   const id = Match.stage.id, k = 1 - hgt * 0.7, c = f.ch.color, act = f.flash > 0 || f.state === "attack" || f.state === "dash" ? 1 : 0;
-  if (id === "paris") {
+  if (id === "paris" || id === "telaviv") {
     // reflet néon sur les pavés mouillés : sprite inversé + halo
     if (!["down", "ko", "juggle"].includes(f.state)) {
       ctx.save(); ctx.globalAlpha = 0.2 * k * f.alpha; ctx.translate(f.x, fl + (fl - f.y) * 0.9); ctx.scale(f.face * info.flip, -0.42);
@@ -136,12 +167,12 @@ function drawGroundAura(ctx, f, info, fl, hgt) {
     ctx.strokeStyle = c; ctx.globalAlpha = 0.25 * k; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(f.x, fl + 2, 110 * k, 10, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
   } else if (id === "jerusalem") {
     const r = 105 * (1 + act * 0.08) * k;
-    drawSeal(ctx, f.x, fl - 2, r, frameCount * 0.02 * (f.side ? -1 : 1), f.id === "hai" ? "#22d3ee" : "#e879f9", "#fbbf24", (0.42 + act * 0.3) * k, 0.24, true);
+    drawSeal(ctx, f.x, fl - 2, r, frameCount * 0.02 * (f.side ? -1 : 1), f.id === "hai" ? "#22d3ee" : f.id === "eye" ? "#c084fc" : "#e879f9", "#fbbf24", (0.42 + act * 0.3) * k, 0.24, true);
   } else if (id === "singularity") {
     ctx.save(); ctx.translate(f.x, fl); ctx.scale(1, 0.26); ctx.globalCompositeOperation = "lighter";
     const R = 150 * k; ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.clip();
     const pulse = 0.3 + 0.2 * Math.sin(frameCount * 0.12) + act * 0.4, off = (f.x * 0.5) % 24;
-    ctx.strokeStyle = f.id === "hai" ? "#22d3ee" : "#c084fc"; ctx.lineWidth = 2; ctx.globalAlpha = pulse * k;
+    ctx.strokeStyle = f.id === "hai" ? "#22d3ee" : f.id === "eye" ? "#fbbf24" : "#c084fc"; ctx.lineWidth = 2; ctx.globalAlpha = pulse * k;
     ctx.beginPath(); for (let x = -R - off; x <= R; x += 24) { ctx.moveTo(x, -R); ctx.lineTo(x, R); } for (let y = -R; y <= R; y += 24) { ctx.moveTo(-R, y); ctx.lineTo(R, y); } ctx.stroke();
     const rr = (frameCount * 3) % R; ctx.globalAlpha = (1 - rr / R) * 0.8 * k; ctx.lineWidth = 5; ctx.strokeStyle = "#a5f3fc"; ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
@@ -209,5 +240,5 @@ function renderFight(ctx) {
   if (Match.flash > 0.02) { ctx.globalAlpha = Math.min(1, Match.flash); ctx.fillStyle = Match.flashColor; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
   if (Match.state === "finish") { ctx.save(); ctx.globalAlpha = 0.22 + 0.1 * Math.sin(frameCount * 0.1); ctx.fillStyle = "#7f1d1d"; ctx.globalCompositeOperation = "multiply"; ctx.fillRect(0, 0, W, H); ctx.restore(); }
 }
-function saveUnlock(k) { try { const u = JSON.parse(localStorage.getItem("mk_av_unlocks") || "{}"); u[k] = 1; localStorage.setItem("mk_av_unlocks", JSON.stringify(u)); } catch (e) { } }
+function saveUnlock(k) { try { const u = JSON.parse(localStorage.getItem("mk_av_unlocks") || "{}"); u[k] = 1; localStorage.setItem("mk_av_unlocks", JSON.stringify(u)); } catch (e) { } if (typeof Progress !== "undefined") Progress.unlockSeen(k); }
 function getUnlocks() { try { return JSON.parse(localStorage.getItem("mk_av_unlocks") || "{}"); } catch (e) { return {}; } }

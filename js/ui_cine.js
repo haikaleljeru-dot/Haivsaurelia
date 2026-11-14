@@ -19,7 +19,7 @@ const Cine = {
     const d = CINEMATICS[id]; if (!d) { onDone && onDone(); return; }
     Object.assign(Cine, { id, data: d, idx: 0, t: 0, paused: false, onDone, lineShown: -1, prevImg: null, fadeOut: 0 });
     Game.setMode("cine"); Screens.show("cine");
-    $("#cine .ttl").textContent = d.title.toUpperCase();
+    $("#cine .ttl").textContent = (typeof I18N !== "undefined" ? I18N.t(d.title) : d.title).toUpperCase();
     $("#cineCtl [data-c=pause]").textContent = "❚❚ Pause";
     Audio2.suspend(false); Audio2.playMusic(d.music || "cine"); Audio2.setIntensity(0.3);
     Cine.enterScene(); saveUnlock("cine_" + id);
@@ -28,7 +28,7 @@ const Cine = {
   // Planifie les répliques selon la VRAIE durée des clips vocaux (aucun chevauchement)
   schedule() {
     const sc = Cine.scene(); let t = 0;
-    Cine.sched = sc.lines.map((L, i) => { const vid = `cine_${Cine.id}_${Cine.idx}_${i}`, d = Audio2.voiceDur(vid) || L.text.length / 15; const st = Math.max(L.t, t); t = st + d + 0.45; return { L, st, vid, d }; });
+    Cine.sched = sc.lines.map((L, i) => { const vid = L.vid || `cine_${Cine.id}_${Cine.idx}_${i}`, d = Audio2.voiceDur(vid) || L.text.length / 15; const st = Math.max(L.t, t); t = st + d + 0.45; return { L, st, vid, d }; });
     Cine.dur = Math.max(sc.dur, t + 0.7);
   },
   enterScene() {
@@ -83,7 +83,7 @@ const Cine = {
     for (let i = 0; i < Cine.sched.length; i++) if (i > Cine.lineShown && Cine.t >= Cine.sched[i].st) {
       Cine.lineShown = i; const S = Cine.sched[i], L = S.L;
       const cps = Math.max(18, L.text.length / Math.max(0.6, S.d * 0.9));
-      $("#cine .subs").innerHTML = `<div class="who" style="color:${WHO_COLOR[L.who] || "#fff"}"><i class="eq"><b></b><b></b><b></b><b></b></i>${L.who}</div><div class="tx" data-full="${L.text.replace(/"/g, "&quot;")}" data-t0="${Cine.t}" data-cps="${cps}"></div>`;
+      $("#cine .subs").innerHTML = `<div class="who" style="color:${WHO_COLOR[L.who] || "#fff"}"><i class="eq"><b></b><b></b><b></b><b></b></i>${typeof I18N !== "undefined" ? I18N.t(L.who) : L.who}</div><div class="tx" data-full="${(typeof I18N !== "undefined" ? I18N.sub(S.vid, L.text) : L.text).replace(/"/g, "&quot;")}" data-t0="${Cine.t}" data-cps="${cps}"></div>`;
       if (Settings.voice) { const d = Audio2.voice(S.vid, { ch: "cine" }); if (!d) { const v = WHO_VOICE[L.who] || [0.8, 1]; Audio2.say(L.text, v[0], v[1] * 1.05); } }
       Cine.speakEnd = Cine.t + S.d;
     }

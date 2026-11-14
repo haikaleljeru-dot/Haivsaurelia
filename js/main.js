@@ -7,7 +7,9 @@ const Game = {
     Game.mode = m; document.documentElement.dataset.mode = m;
     $("#hud").classList.toggle("on", m === "fight");
     $("#trainPanel").classList.toggle("on", m === "fight" && !!Match.training);
-    $("#trainHelp").classList.toggle("on", m === "fight" && !!Match.training);
+    $("#trainHelp").classList.toggle("on", m === "fight" && !!Match.training && !Match.training.tutorial);
+    $("#tutBox").classList.toggle("on", m === "fight" && !!(Match.training && Match.training.tutorial));
+    $("#netInfo").classList.toggle("on", m === "fight" && Match.type === "online");
     if (m !== "fight") { $("#banner").className = ""; $("#finishBox").classList.remove("on"); Match.paused = false; ["f0", "f1", "ann"].forEach(c => Audio2.stopVoice(c)); $$(".bub").forEach(b => b.classList.remove("on")); }
     if (m === "menu") Vid.stopAll();
     applySettings();
@@ -16,27 +18,46 @@ const Game = {
 const Flow = {
   lastOpts: null,
   fight(opts) {
-    Flow.lastOpts = opts; Sel.p1 = opts.p1Char;
+    Flow.lastOpts = opts; if (opts.type !== "online") Sel.p1 = opts.p1Char;
     Screens.show("hud"); $$(".ovl").forEach(o => o.classList.remove("on"));
     Cam.x = W / 2; Cam.y = H / 2; Cam.z = 1;
-    Match.paused = false; acc = 0;
+    Match.paused = false; acc = 0; Match.koinBank = 0; Match.lostRound = false;
+    if (opts.type === "online") frameCount = 0; // lockstep : les deux pairs démarrent au frame 0
+    Match.tower = opts.tower || null; Match.towerPending = false;
     setupMatch(opts);
+    F.forEach(f => Costumes.prepare(f));
     Game.setMode("fight");
-    Training.refresh();
+    Training.refresh(); Training.panel();
+    if (Settings.replay !== false) Replay.start();
+    if (opts.onStart) opts.onStart();
   },
   storyStart(char, diff) {
-    Object.assign(Story, { active: true, char, diff, stage: 0, continues: 0 }); Sel.p1 = char;
+    Object.assign(Story, { active: true, char, diff, stage: 0, continues: 0, lost: 0 }); Sel.p1 = char;
     Cine.play("intro", () => Flow.storyStage());
   },
   storyStage() {
     Story.active = true;
-    Screens.vs(Story.stage, () => Flow.fight({ type: "story", stageIdx: Story.stage, p1Char: Story.char, difficulty: Story.diff }));
+    const [opp, st] = (STORY_PATH[Story.char] || STORY_PATH.aurelia)[Story.stage];
+    Screens.vs(st, () => Flow.fight({ type: "story", stageIdx: st, p1Char: Story.char, p2Char: opp, difficulty: Story.diff }), Story.char, opp);
   },
   storyNext() {
     Story.stage++;
     if (Story.stage === 1) Cine.play("interlude_jerusalem", () => Flow.storyStage());
     else if (Story.stage === 2) Cine.play("interlude_singularity", () => Flow.storyStage());
-    else { const id = Story.char === "aurelia" ? "ending_aurelia" : "ending_hai"; Story.active = false; saveUnlock("story_" + Story.char); Cine.play(id, () => { UI.toast("🏆 CAMPAGNE TERMINÉE — fin ajoutée à la galerie"); Screens.title(); }); }
+    else {
+      const id = "ending_" + Story.char; Story.active = false; saveUnlock("story_" + Story.char);
+      const perfect = Story.lost === 0 && Story.continues === 0;
+      Progress.award("story"); Progress.addKoins(500, "Histoire terminée");
+      const newEye = Progress.unlock("eye", true);
+      let play = id;
+      if (perfect) { // FIN SECRÈTE : Histoire gagnée sans perdre un seul round => scènes ajoutées à la fin
+        const E = CINEMATICS[id], S = CINEMATICS.secret;
+        CINEMATICS._combo = { title: E.title + " + " + S.title, music: "cine", scenes: E.scenes.map((sc, si) => Object.assign({}, sc, { lines: sc.lines.map((l, li) => Object.assign({ vid: `cine_${id}_${si}_${li}` }, l)) }))
+          .concat(S.scenes.map((sc, si) => Object.assign({}, sc, { lines: sc.lines.map((l, li) => Object.assign({ vid: `cine_secret_${si}_${li}` }, l)) }))) };
+        play = "_combo"; saveUnlock("cine_secret"); Progress.award("secret");
+      }
+      Cine.play(play, () => { UI.toast(L("🏆 CAMPAGNE TERMINÉE — fin ajoutée à la galerie")); if (newEye) Progress.toast("👁️ " + L("NOUVEAU COMBATTANT"), L("L'Œil Quantique est maintenant jouable !"), "unlock"); Screens.title(); });
+    }
   },
   demo(char, kind, stageIdx) {
     Flow.fight({ type: "training", stageIdx, p1Char: char, training: { dummy: "idle" } });
@@ -50,27 +71,29 @@ const Training = {
     p.innerHTML = `<h4>MANNEQUIN</h4><div id="tDummy">${[["idle", "Immobile"], ["guard", "Garde"], ["jump", "Saute"], ["ai", "IA"]].map(([k, l]) => `<button class="btn" data-d="${k}">${l}</button>`).join("")}</div>
       <h4>OPTIONS</h4><button class="btn" id="tMeter">Super infini</button><button class="btn" id="tRegen">Vie auto</button>
       <h4>DÉMO FATALITY</h4><button class="btn red" data-f="fatality1">Fatality 1</button><button class="btn red" data-f="fatality2">Fatality 2</button>
-      <button class="btn red" data-f="stage">Stage Fatality</button><button class="btn red" data-f="brutality">Brutality</button><button class="btn" data-f="xray">X-Ray</button>
-      <h4>ARÈNE</h4>${STAGES.map((s, i) => `<button class="btn" data-s="${i}">${["Paris", "Jérusalem", "Singularité"][i]}</button>`).join("")}
+      <button class="btn red" data-f="stage">Stage</button><button class="btn red" data-f="brutality">Brutality</button><button class="btn red" data-f="friendship">Friendship</button><button class="btn red" data-f="animality">Animality</button><button class="btn" data-f="xray">X-Ray</button>
+      <h4>ARÈNE</h4>${STAGES.map((s, i) => `<button class="btn" data-s="${i}">${STAGE_SHORT[s.id]}</button>`).join("")}
       <div style="margin-top:6px"><button class="btn" id="tSwap">Changer de perso</button><button class="btn" id="tQuit">Quitter</button></div>
       <div id="tCombo" style="margin-top:6px;color:#fbbf24;font:700 12px Orbitron"></div>`;
     p.querySelectorAll("[data-d]").forEach(b => b.onclick = () => { Match.training.dummy = b.dataset.d; Training.refresh(); });
     $("#tMeter").onclick = () => { Match.training.infMeter = !Match.training.infMeter; Training.refresh(); };
     $("#tRegen").onclick = () => { Match.training.regen = !Match.training.regen; Training.refresh(); };
     p.querySelectorAll("[data-f]").forEach(b => b.onclick = () => Training.finisher(b.dataset.f));
-    p.querySelectorAll("[data-s]").forEach(b => b.onclick = () => Flow.fight({ type: "training", stageIdx: +b.dataset.s, p1Char: Match.p1Char, training: { dummy: Match.training.dummy } }));
-    $("#tSwap").onclick = () => Flow.fight({ type: "training", stageIdx: Match.stageIdx, p1Char: otherChar(Match.p1Char), training: { dummy: Match.training.dummy } });
+    p.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { const i = +b.dataset.s; if (!Progress.stageAvailable(i)) { UI.toast(L("🔒 Arène à débloquer dans la Krypte (250 Koins) ou à l'étage 5 de la Tour")); return; } Flow.fight({ type: "training", stageIdx: i, p1Char: Match.p1Char, p2Char: Match.p2Char, training: { dummy: Match.training.dummy } }); });
+    $("#tSwap").onclick = () => { const n = nextChar(Match.p1Char, 1); Flow.fight({ type: "training", stageIdx: Match.stageIdx, p1Char: n, p2Char: defaultOpp(n), training: { dummy: Match.training.dummy } }); };
     $("#tQuit").onclick = () => Screens.title();
   },
+  panel() { $$("#trainPanel [data-s]").forEach((b, i) => b.classList.toggle("lockd", !Progress.stageAvailable(i))); I18N.apply($("#trainPanel")); },
   refresh() {
-    if (!Match.training) { $("#trainPanel").classList.remove("on"); $("#trainHelp").classList.remove("on"); return; }
+    if (!Match.training || Match.training.tutorial) { $("#trainPanel").classList.remove("on"); $("#trainHelp").classList.remove("on"); return; }
     $$("#tDummy .btn").forEach(b => b.classList.toggle("sel", b.dataset.d === Match.training.dummy));
     $("#tMeter").classList.toggle("sel", Match.training.infMeter); $("#tRegen").classList.toggle("sel", Match.training.regen);
     $$("#trainPanel [data-s]").forEach(b => b.classList.toggle("sel", +b.dataset.s === Match.stageIdx));
     const c = F[0].ch;
     $("#trainHelp").innerHTML = `<b style="color:${c.color};font-family:Orbitron">${c.name} — LISTE RAPIDE</b><br>
       Rapide <kbd>${keyOf("p1", "lp")}</kbd> • Lourd <kbd>${keyOf("p1", "hp")}</kbd> • Spécial <kbd>${keyOf("p1", "sp")}</kbd><br>Téléport <kbd>${keyOf("p1", "tp")}</kbd> • Chope <kbd>${keyOf("p1", "gp")}</kbd> • EX <kbd>${keyOf("p1", "ex")}</kbd> • X-Ray <kbd>${keyOf("p1", "xr")}</kbd><br>
-      Combo : Rapide › Rapide › Lourd › Spécial<br>☠ ${c.fatalities[0].codeTxt}<br>☠ ${c.fatalities[1].codeTxt}<br>⚡ Stage : ${STAGE_FATALITY_CODE.codeTxt}<br>Les codes marchent quand l'adversaire est étourdi (FINISH).`;
+      Combo : Rapide › Rapide › Lourd › Spécial<br>☠ ${c.fatalities[0].codeTxt} • ☠ ${c.fatalities[1].codeTxt}<br>💖 ${c.friendship.codeTxt} • 🐾 ${c.animality.codeTxt}<br>⚡ Stage : ${STAGE_FATALITY_CODE.codeTxt}<br>Les codes marchent quand l'adversaire est étourdi (FINISH).`;
+    I18N.apply($("#trainHelp"));
   },
   finisher(kind) {
     if (Game.mode !== "fight" || !Match.training || Match.seq) return;
@@ -79,7 +102,7 @@ const Training = {
     if (Match.state !== "fight") return;
     v.x = clamp(a.x + a.face * 230, 120, W - 120); if (Math.abs(v.x - a.x) < 150) { a.x = clamp(v.x - a.face * 230, 120, W - 120); }
     a.face = v.x >= a.x ? 1 : -1; v.face = -a.face; v.y = Match.stage.floor; v.hp = 1; setState(v, "stun"); setState(a, "idle");
-    startFinisher(a, v, kind);
+    Match.training.demoFin = true; startFinisher(a, v, kind);
   }
 };
 // -------------------- TACTILE --------------------
@@ -124,9 +147,10 @@ UI.onKey = e => {
   }
   if (Game.mode === "vs") { if (c === "Enter" || c === "Escape" || c === "Space") Screens.vsSkip && Screens.vsSkip(); return; }
   if (c === "F9") { Settings.perf = !Settings.perf; saveSettings(); return; }
-  if (Game.mode === "fight" && !Match.paused && !$("#results").classList.contains("on")) { if (c === "Escape" || c === "KeyP" && Match.type !== "2p" && false) Screens.pause(); if (c === "Escape") return; return; }
+  if (Game.mode === "fight" && !Match.paused && !$("#results").classList.contains("on")) { if (c === "Escape") { if (Tutorial.active && Match.type === "tutorial" && false) return; Screens.pause(); } return; }
   if (c === "Escape" || c === "Backspace") { if (Match.paused && Game.mode === "fight") Screens.pause(false); else UI.back(); return; }
-  if (Screens.cur === "select" && !$$(".ovl.on").length && (c === "ArrowLeft" || c === "ArrowRight")) { Sel.p1 = otherChar(Sel.p1); Audio2.play("select"); Screens.renderSelect(); return; }
+  if (Screens.cur === "select" && !$$(".ovl.on").length && (c === "ArrowLeft" || c === "ArrowRight")) { Sel.p1 = nextChar(Sel.p1, c === "ArrowRight" ? 1 : -1); if (Sel.p2Auto) Sel.p2 = defaultOpp(Sel.p1); Audio2.play("select"); Screens.renderSelect(); return; }
+  if (Screens.cur === "title" && !$$(".ovl.on").length) Konami.key(c);
   if (c === "ArrowUp" || c === "ArrowLeft") UI.moveFocus(-1);
   else if (c === "ArrowDown" || c === "ArrowRight" || c === "Tab") { e.preventDefault(); UI.moveFocus(1); }
   else if (c === "Enter" || c === "Space" || c === "NumpadEnter") { e.preventDefault(); UI.activate(); }
@@ -152,6 +176,11 @@ const Boot = {
     const v = $("#bootVid"); if (!v) return;
     v.textContent = Boot.vN >= Boot.vTotal ? (Vid.errors.length ? "⚠ " + Vid.errors.length + " vidéo(s) indisponible(s) — illustrations utilisées" : "🎬 " + Object.keys(VID).length + " vidéos cinématiques prêtes") : "🎬 vidéos cinématiques : " + Boot.vN + "/" + Boot.vTotal + " (chargement en arrière-plan)";
   },
+  // images non critiques (illustrations de Friendship/Animality, fins…) : chargées après le démarrage
+  loadLazy() {
+    const M = window.ASSET_LAZY || {};
+    Object.keys(M).forEach((k, i) => setTimeout(() => { const im = new Image(); im.decoding = "async"; im.onload = () => { IMG[k] = im; }; im.src = M[k]; }, 80 * i));
+  },
   loadImages() {
     const M = window.ASSET_MANIFEST, keys = Object.keys(M); let n = 0;
     return new Promise(res => {
@@ -167,13 +196,16 @@ const Boot = {
     if (Boot.ready) return; Boot.ready = true;
     const miss = Boot.errors.length + Audio2.voiceErrors.length;
     $("#boot .bar i").style.width = "100%";
-    $("#boot .txt").textContent = timeout ? "CONNEXION LENTE — le reste se charge pendant que tu joues" : miss ? "⚠ " + miss + " élément(s) manquant(s)" : `MULTIVERS CHARGÉ — ${Object.keys(IMG).length} visuels • ${Audio2.voiceCount} voix`;
+    $("#boot .txt").textContent = timeout ? L("CONNEXION LENTE — le reste se charge pendant que tu joues") : miss ? "⚠ " + miss + " " + L("élément(s) manquant(s)") : `${L("MULTIVERS CHARGÉ")} — ${Object.keys(IMG).length} ${L("visuels")} • ${Audio2.voiceCount} ${L("voix")}`;
+    setTimeout(() => Boot.loadLazy(), 400);
     $("#boot .press").style.display = "block"; $("#boot").classList.add("ready");
     Boot.status();
   },
   async start() {
     Boot.t0 = performance.now();
+    Progress.load(); I18N.init();
     applySettings(); Input.init(); Screens.buildSelect(); Training.build(); buildTouch(); fitStage(); View.init();
+    Online.checkJoinLink();
     Boot.total = Object.keys(window.ASSET_MANIFEST).length + Object.keys(window.VOICE_MANIFEST || {}).length;
     Boot.vTotal = Object.keys(window.VIDEO_MANIFEST || {}).length;
     requestAnimationFrame(loop);
@@ -195,6 +227,7 @@ const Boot = {
     Audio2.init(); Audio2.play("gong");
     if (View.isTouch() && !View.isFull()) View.fullscreen(true);
     Screens.title();
+    if (Online.pendingJoin) setTimeout(() => Online.open(Online.pendingJoin), 300);
   }
 };
 // -------------------- AFFICHAGE : échelle, zones sûres (encoches), plein écran, orientation --------------------
@@ -249,7 +282,8 @@ function loop(ts) {
   const ctx = CTX;
   pollMenuPad(); Audio2.tick();
   if (Game.mode === "fight") {
-    if (!Match.paused) {
+    if (Match.type === "online") { Online.frame(dt); UI.updateHud(); }
+    else if (!Match.paused) {
       acc += dt * 1000 * Match.timeScale; let n = 0;
       // entrées en attente => on traite le tick logique sans attendre l'accumulateur complet (latence mini)
       if (acc < STEP && Input.queue.length && acc > STEP * 0.5 && Match.timeScale >= 1) acc = STEP;
@@ -258,7 +292,7 @@ function loop(ts) {
       UI.updateHud();
       if (Match.training && Match.training.lastCombo) $("#tCombo").textContent = "DERNIER COMBO : " + Match.training.lastCombo.n + " coups / " + Math.round(Match.training.lastCombo.d) + "%";
     } else Input.endStep();
-    renderFight(ctx);
+    renderFight(ctx); Replay.frame();
   } else if (Game.mode === "cine") { Cine.update(dt); Cine.draw(ctx); Input.endStep(); }
   else if (Game.mode === "vs") { VsBG.draw(ctx, dt); Input.endStep(); }
   else if (Game.mode === "menu") { MenuBG.draw(ctx, dt); Input.endStep(); }
@@ -270,7 +304,9 @@ window.addEventListener("DOMContentLoaded", () => {
   $("#boot").addEventListener("click", () => Boot.ready && Boot.enter());
   // Menu titre
   const T = { story: () => Screens.select("story"), vs: () => Screens.select("1p"), duo: () => Screens.select("2p"), train: () => Screens.select("training"),
-    intro: () => Cine.play("intro", () => Screens.title()), gal: () => Screens.gallery("cine"), opt: () => Screens.options(), mv: () => Screens.moves() };
+    intro: () => Cine.play("intro", () => Screens.title()), gal: () => Screens.gallery("cine"), opt: () => Screens.options(), mv: () => Screens.moves(),
+    online: () => Online.open(), tower: () => Tower.open(), tuto: () => Tutorial.start(Sel.p1), krypt: () => Screens.krypt(), troph: () => Screens.trophies() };
+  $$("#langSel .lng").forEach(b => b.onclick = e => { e.stopPropagation(); I18N.set(b.dataset.lang); Audio2.play("ui"); Screens.koinTag(); });
   $$("#title [data-m]").forEach(b => { b.onclick = () => { Audio2.init(); Audio2.play("select"); T[b.dataset.m](); }; b.onmouseenter = () => Audio2.play("ui"); });
   $$("#galTabs .btn").forEach(b => b.onclick = () => Screens.gallery(b.dataset.t));
   $$("[data-close]").forEach(b => b.onclick = () => Screens.title());
@@ -278,9 +314,13 @@ window.addEventListener("DOMContentLoaded", () => {
   $("#pRestart").onclick = () => { Screens.pause(false); Flow.fight(Flow.lastOpts); };
   $("#pMoves").onclick = () => { const on = $("#pauseMoves").classList.toggle("hidden"); };
   $("#pFull").onclick = () => View.fullscreen();
-  $("#pQuit").onclick = () => { Screens.pause(false); Screens.title(); };
+  $("#pQuit").onclick = () => { Screens.pause(false); if (Match.type === "online") Online.disconnect(true); Screens.title(); };
+  $("#pClip").onclick = () => Replay.save();
   $("#cineCtl").addEventListener("click", e => { const c = e.target.dataset.c; if (!c) return; ({ prev: () => Cine.go(-1), pause: () => Cine.togglePause(), next: () => Cine.go(1), skip: () => Cine.finish(), replay: () => Cine.replay() })[c](); });
   Boot.start();
 });
 // Hook de test / debug
-window.MK = { Game, Boot, View, Match, F, Flow, Screens, Cine, Training, Settings, IMG, VID, Vid, Audio2, Input, Story, Sel, get fps() { return fpsAvg; } };
+// Code Konami (écran titre) : ↑↑↓↓←→←→ B A => débloque L'Œil Quantique
+const Konami = { seq: ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "KeyB", "KeyA"], i: 0,
+  key(c) { if (c === Konami.seq[Konami.i]) { if (++Konami.i === Konami.seq.length) { Konami.i = 0; if (!Progress.unlock("eye")) UI.toast(L("L'Œil Quantique est déjà débloqué")); Screens.koinTag(); } } else Konami.i = c === Konami.seq[0] ? 1 : 0; } };
+window.MK = { Game, Boot, View, Match, F, Flow, Screens, Cine, Training, Settings, IMG, VID, Vid, Audio2, Input, Story, Sel, Progress, Tower, Tutorial, Online, Replay, I18N, get fps() { return fpsAvg; } };

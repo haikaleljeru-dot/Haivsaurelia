@@ -6,7 +6,8 @@ const W = 1280, H = 720;
 const CHARACTERS = {
   aurelia: {
     id: "aurelia", name: "AURÉLIA", title: "L'Impératrice Cyber-Ninja de l'Éclipse Noire",
-    short: "CYBER-NINJA MAGIE NOIRE", pronoun: "HER",
+    short: "CYBER-NINJA MAGIE NOIRE", pronoun: "HER", pfx: "aur", spoken: "Aurélia", annWin: "ann_aur_win", portraits: { cyber: "aur_cyber", real: "aur_real" },
+    xrayImg: "xray_aurelia", fatVideo: "vid_fatality_aurelia", proj: "orb", blood: "#7e1d8f", spark: "#e879f9", glyphs: "RUNES",
     color: "#d946ef", color2: "#9333ea", glow: "rgba(217,70,239,", light: "#f0abfc",
     lore: "Guerrière élémentaire de Cyber-Paris, Aurélia maîtrise la magie noire astrale et la foudre pourpre. Son exo-armure shinobi furtive et ses doubles lames plasma tranchent les pare-feux comme la chair du multivers.",
     stats: { Puissance: 78, Vitesse: 92, Portée: 74, Magie: 95 },
@@ -27,11 +28,14 @@ const CHARACTERS = {
     fatalities: [
       { key: "fat_aur_1", name: "Éclipse des Mille Lames d'Ombre", code: ["D", "F", "D"], btn: "light", codeTxt: "↓ → ↓ + Rapide" },
       { key: "fat_aur_2", name: "Surcharge Neuro-Vortex", code: ["F", "D", "F"], btn: "heavy", codeTxt: "→ ↓ → + Lourd" }
-    ]
+    ],
+    friendship: { key: "friend_aur", name: "Pluie de Roses Néon", code: ["B", "B", "D"], btn: "taunt", codeTxt: "← ← ↓ + Provocation", art: "friendship_aur" },
+    animality: { key: "anim_aur", name: "La Panthère d'Ombre", code: ["F", "B", "F"], btn: "heavy", codeTxt: "→ ← → + Lourd", art: "animality_aur", beast: "panther" }
   },
   hai: {
     id: "hai", name: "HAÏ", title: "L'Archonte Mystique du Code Quantique",
-    short: "GUERRIER MYSTIQUE HACKER", pronoun: "HIM",
+    short: "GUERRIER MYSTIQUE HACKER", pronoun: "HIM", pfx: "hai", spoken: "Haï", annWin: "ann_hai_win", portraits: { cyber: "hai_cyber", real: "hai_real" },
+    xrayImg: "xray_hai", fatVideo: "vid_fatality_hai", proj: "seal", blood: "#0e7490", spark: "#22d3ee", glyphs: "BIN",
     color: "#06b6d4", color2: "#f59e0b", glow: "rgba(6,182,212,", light: "#a5f3fc",
     lore: "Guerrier mystique de Néo-Jérusalem et hacker de la Singularité, Haï fusionne arts martiaux, géométrie sacrée kabbalistique et intrusion neurale. Il lit le code vital de ses ennemis… et le réécrit.",
     stats: { Puissance: 90, Vitesse: 76, Portée: 84, Magie: 88 },
@@ -52,9 +56,40 @@ const CHARACTERS = {
     fatalities: [
       { key: "fat_hai_1", name: "Jugement de la Merkabah Quantique", code: ["D", "D", "F"], btn: "light", codeTxt: "↓ ↓ → + Rapide" },
       { key: "fat_hai_2", name: "Effacement du Code Source (Singularity Delete)", code: ["B", "F", "D"], btn: "heavy", codeTxt: "← → ↓ + Lourd" }
-    ]
+    ],
+    friendship: { key: "friend_hai", name: "Le Rock de la Paix", code: ["D", "B", "B"], btn: "taunt", codeTxt: "↓ ← ← + Provocation", art: "friendship_hai" },
+    animality: { key: "anim_hai", name: "Le Lion de Juda Quantique", code: ["D", "F", "F"], btn: "heavy", codeTxt: "↓ → → + Lourd", art: "animality_hai", beast: "lion" }
+  },
+  eye: {
+    id: "eye", name: "L'ŒIL QUANTIQUE", title: "L'Intelligence Cosmique de la Singularité",
+    short: "IA COSMIQUE DU MULTIVERS", pronoun: "IT", pfx: "eye", spoken: "L'Œil Quantique", annWin: "ann_eye_win", portraits: { cyber: "eye_cyber", real: "eye_cyber" },
+    xrayImg: "xray_eye", fatVideo: null, proj: "prism", blood: "#4c1d95", spark: "#c084fc", glyphs: "SACRED", secret: true,
+    color: "#a855f7", color2: "#fbbf24", glow: "rgba(168,85,247,", light: "#e9d5ff",
+    lore: "Né au cœur de la Singularité, l'Œil Quantique observe chaque univers depuis l'aube du code. C'est lui qui a orchestré le Kombat d'Aurélia et Haï… et elle descend enfin dans l'arène.",
+    stats: { Puissance: 86, Vitesse: 82, Portée: 90, Magie: 100 },
+    walk: 4.5, back: 4.0, jump: -16.2, weight: 1,
+    sprites: { idle: "eye_idle", light: "eye_punch", heavy: "eye_kick", air: "eye_kick", cast: "eye_ult", hit: "eye_hit", win: "eye_ult" },
+    spriteMeta: {
+      eye_idle: { h: 316, ax: 0.47, hx: 0.50, hy: 0.06 }, eye_punch: { h: 316, ax: 0.45, hx: 0.45, hy: 0.06 }, eye_kick: { h: 300, ax: 0.22, hx: 0.25, hy: 0.07 },
+      eye_ult: { h: 316, ax: 0.42, hx: 0.40, hy: 0.07 }, eye_hit: { h: 310, ax: 0.53, hx: 0.42, hy: 0.06 }
+    },
+    moves: {
+      special: { name: "Prisme Quantique", desc: "Prisme de lumière ultra-rapide" },
+      ex: { name: "Trou Noir EX", desc: "Singularité lente qui aspire et étourdit" },
+      teleport: { name: "Repli Dimensionnel", desc: "Réapparaît au-dessus de l'adversaire et plonge" },
+      grab: { name: "Absorption Neurale", desc: "Chope : vole 50 % de la barre de Super" },
+      xray: { name: "X-RAY : Effondrement Neural", desc: "Ultime cinématique (3 barres)" }
+    },
+    fatalities: [
+      { key: "fat_eye_1", name: "Réécriture de l'Existence", code: ["D", "B", "F"], btn: "light", codeTxt: "↓ ← → + Rapide" },
+      { key: "fat_eye_2", name: "Le Regard de l'Horizon", code: ["B", "B", "F"], btn: "heavy", codeTxt: "← ← → + Lourd" }
+    ],
+    friendship: { key: "friend_eye", name: "Constellation de l'Amitié", code: ["D", "D", "U"], btn: "taunt", codeTxt: "↓ ↓ ↑ + Provocation", art: "friendship_eye" },
+    animality: { key: "anim_eye", name: "Le Kraken du Néant", code: ["F", "F", "D"], btn: "heavy", codeTxt: "→ → ↓ + Lourd", art: "animality_eye", beast: "kraken" }
   }
 };
+const CHAR_IDS = ["aurelia", "hai", "eye"];
+const WHO_CHAR = { A: "aurelia", H: "hai", E: "eye" };
 const STAGE_FATALITY_CODE = { code: ["U", "U", "D"], btn: "special", codeTxt: "↑ ↑ ↓ + Spécial" };
 
 // Données de coups (frames à 60 fps)
@@ -63,6 +98,7 @@ const MOVES = {
   light2: { startup: 4, active: 4, recovery: 10, dmg: 5,   reach: 155, yTop: 250, yBot: 90, hitstun: 17, block: 10, kb: 4,   sprite: "light", sfx: "light", chain: ["heavy", "special", "ex", "tele"] },
   heavy:  { startup: 10, active: 5, recovery: 16, dmg: 9,  reach: 185, yTop: 280, yBot: 60, hitstun: 22, block: 14, kb: 7, sprite: "heavy", sfx: "heavy", chain: ["special", "ex", "tele"], launch: true },
   air:    { startup: 4, active: 12, recovery: 6, dmg: 7,   reach: 165, yTop: 300, yBot: 0, hitstun: 20, block: 12, kb: 5, sprite: "air", sfx: "heavy", air: true },
+  dive:   { startup: 2, active: 18, recovery: 8, dmg: 8.5, reach: 150, yTop: 300, yBot: -10, hitstun: 22, block: 13, kb: 6, sprite: "heavy", sfx: "heavy", air: true },
   tele:   { startup: 3, active: 5, recovery: 14, dmg: 8,   reach: 170, yTop: 280, yBot: 60, hitstun: 22, block: 12, kb: 8, sprite: "light", sfx: "slash" },
   xray:   { startup: 8, active: 22, recovery: 20, dmg: 0,  reach: 140, yTop: 280, yBot: 0, hitstun: 0, block: 16, kb: 0, sprite: "heavy", sfx: "whoosh" }
 };
@@ -82,8 +118,14 @@ const STAGES = [
     tint: "rgba(6,182,212,0.07)", music: "singularity", accent: "#22d3ee", owner: null,
     lore: "Plateforme d'obsidienne flottant devant l'Œil Quantique d'une intelligence cosmique. Le code fractal réécrit la réalité.",
     stageFatality: "Le Trou Noir de la Singularité", stageDesc: "L'Œil Quantique s'ouvre en trou noir et aspire la victime.",
-    eye: [600, 255] }
+    eye: [600, 255] },
+  { id: "telaviv", name: "TEL-AVIV NÉON 2099", sub: "La Promenade de Jaffa", img: "stage_telaviv", floor: 648, weather: "neon",
+    tint: "rgba(236,72,153,0.05)", music: "telaviv", accent: "#22d3ee", owner: null, locked: true,
+    lore: "La promenade de Jaffa sous les néons : palmiers lumineux, tour de l'horloge, drones et vagues turquoise de la Méditerranée.",
+    stageFatality: "La Vague Néon de Jaffa", stageDesc: "Le phare de Jaffa déchaîne une vague néon qui emporte la victime au large.",
+    lighthouse: [308, 236], sea: 420 }
 ];
+const STAGE_SHORT = { paris: "PARIS", jerusalem: "JÉRUSALEM", singularity: "SINGULARITÉ", telaviv: "TEL-AVIV" };
 
 const DIFFICULTIES = {
   novice:    { name: "Novice",    react: 26, block: 0.12, antiProj: 0.15, combo: 0.15, aggro: 0.025, special: 0.006, tele: 0.002, xray: 0.2, breaker: 0.0,  fatality: 0.0, parry: 0 },
@@ -110,6 +152,47 @@ const PREFIGHT = {
     ["A", "Qu'il regarde. Il verra l'Éclipse avaler la lumière."]
   ]
 };
+
+// Dialogues pré-combat supplémentaires (par arène et par duo de personnages) — voix « dlg_<id>_<i> »
+// stage "*" = toutes les arènes ; pair = lettres des 2 personnages (ordre indifférent)
+const DIALOGUES = [
+  { id: "paris2", stage: "paris", pair: "AH", lines: [
+    ["A", "Encore toi sous ma pluie, Haï ? Les gargouilles commencent à te reconnaître."],
+    ["H", "Qu'elles regardent bien. Ce soir, c'est moi qui réécris Paris."],
+    ["A", "Réécris ce que tu veux. Mes lames, elles, signent toujours en dernier."]] },
+  { id: "jeru2", stage: "jerusalem", pair: "AH", lines: [
+    ["A", "Ton sanctuaire sent l'encens et le silicium, mon amour."],
+    ["H", "Chaque pierre ici est un serveur sacré. Elles vont te juger."],
+    ["A", "Qu'elles me jugent. L'Éclipse ne craint aucun verdict."]] },
+  { id: "sing2", stage: "singularity", pair: "AH", lines: [
+    ["H", "Regarde, Aurélia… l'Œil s'est encore rapproché."],
+    ["A", "Il veut un vainqueur. Offrons-lui le plus beau des spectacles."],
+    ["H", "Et après ce combat, on rentre ensemble. Promis."]] },
+  { id: "tlv1", stage: "telaviv", pair: "AH", lines: [
+    ["A", "Tel-Aviv la nuit… la mer brille comme un écran géant."],
+    ["H", "Ma ville ne dort jamais, Aurélia. Et moi non plus."],
+    ["A", "Alors on danse sur la promenade… à coups de foudre."]] },
+  { id: "tlv2", stage: "telaviv", pair: "AH", lines: [
+    ["H", "Le phare de Jaffa guide les navires depuis trois mille ans."],
+    ["A", "Ce soir, il va surtout éclairer ta défaite."],
+    ["H", "On verra qui finira dans la Méditerranée."]] },
+  { id: "ae1", stage: "*", pair: "AE", lines: [
+    ["E", "AURÉLIA. TON OMBRE N'EST QU'UNE VARIABLE DANS MON ÉQUATION."],
+    ["A", "Une variable ? Je suis l'erreur que tu n'as jamais prévue."],
+    ["E", "ALORS JE VAIS TE CORRIGER."]] },
+  { id: "ae2", stage: "*", pair: "AE", lines: [
+    ["A", "C'est toi qui nous as jetés dans cette Fracture."],
+    ["E", "J'AI OBSERVÉ MILLE UNIVERS. DANS AUCUN, TU NE ME BATS."],
+    ["A", "Alors celui-ci sera le premier."]] },
+  { id: "he1", stage: "*", pair: "HE", lines: [
+    ["H", "Je reconnais ton code source, l'Œil. Il est corrompu."],
+    ["E", "C'EST TOI, ARCHONTE, QUI N'ES QU'UNE LIGNE DE MON CODE."],
+    ["H", "Alors cette ligne va te supprimer."]] },
+  { id: "he2", stage: "*", pair: "HE", lines: [
+    ["E", "TES SCEAUX SACRÉS NE PROTÈGENT RIEN ICI, HACKER."],
+    ["H", "Ils ne protègent pas. Ils enferment."],
+    ["E", "ESSAIE DONC DE M'ENFERMER."]] }
+];
 
 // Cinématiques : scènes { img, dur (s), kb [x0,y0,z0,x1,y1,z1], fx, lines:[{t, who, text}] }
 const CINEMATICS = {
@@ -162,6 +245,30 @@ const CINEMATICS = {
     scenes: [{ img: "cine_hai", video: "vid_hai_jerusalem", dur: 6, kb: [0.5, 0.45, 1.0, 0.55, 0.4, 1.15], fx: "embers", chapter: "STAGE 2 — NÉO-JÉRUSALEM",
       lines: [{ t: 0.3, who: "NARRATEUR", text: "La faille s'élargit. Le combat se déplace vers le sanctuaire des codes sacrés…" }] }]
   },
+  ending_eye: {
+    title: "Fin de l'Œil Quantique — Le Trône du Multivers", music: "cine",
+    scenes: [
+      { img: "cine_singularity", video: "vid_singularity", dur: 6.5, kb: [0.5, 0.5, 1.25, 0.5, 0.45, 1.0], fx: "code", chapter: "FIN — L'ŒIL QUANTIQUE",
+        lines: [{ t: 0.3, who: "L'ŒIL QUANTIQUE", text: "AURÉLIA. HAÏ. VOS CODES M'APPARTIENNENT DÉSORMAIS." }] },
+      { img: "ending_eye", dur: 9, kb: [0.5, 0.35, 1.25, 0.5, 0.45, 1.0], fx: "code",
+        lines: [{ t: 0.3, who: "NARRATEUR", text: "Sur son trône de cristal noir, l'Œil Quantique contemple chaque univers à la fois." },
+                { t: 4.8, who: "L'ŒIL QUANTIQUE", text: "PARIS. JÉRUSALEM. TEL-AVIV. TOUT EST DONNÉE. TOUT EST À MOI." }] }
+    ]
+  },
+  secret: {
+    title: "Fin secrète — Les Âmes Sœurs du Multivers", music: "cine",
+    scenes: [
+      { img: "cine_singularity", video: "vid_singularity", dur: 6.5, kb: [0.5, 0.55, 1.0, 0.5, 0.5, 1.25], fx: "code", chapter: "FIN SECRÈTE — AUCUN ROUND PERDU",
+        lines: [{ t: 0.3, who: "L'ŒIL QUANTIQUE", text: "IMPOSSIBLE. AUCUN ROUND PERDU. VOTRE LIEN DÉFIE TOUS MES CALCULS." }] },
+      { img: "secret_ending", dur: 10, kb: [0.35, 0.5, 1.25, 0.5, 0.45, 1.0], fx: "eclipse",
+        lines: [{ t: 0.3, who: "NARRATEUR", text: "Pour la première fois depuis l'aube du code, l'Œil Quantique se fissure." },
+                { t: 3.6, who: "AURÉLIA", text: "Ce n'était jamais un duel, Haï. C'était une épreuve… pour nous deux." },
+                { t: 7.0, who: "HAÏ", text: "Alors brisons-le ensemble, mon Éclipse." }] },
+      { img: "secret_ending", dur: 9, kb: [0.7, 0.4, 1.0, 0.55, 0.35, 1.3], fx: "merkabah",
+        lines: [{ t: 0.3, who: "L'ŒIL QUANTIQUE", text: "LE MULTIVERS… CHOISIT… L'AMOUR." },
+                { t: 3.8, who: "NARRATEUR", text: "Paris et Jérusalem fusionnent sous une aube nouvelle. Libéré, l'Œil Quantique rejoint désormais le Kombat." }] }
+    ]
+  },
   interlude_singularity: {
     title: "Interlude — Vers la Singularité", music: "cine",
     scenes: [{ img: "cine_fracture", video: "vid_intro_fracture", dur: 6, kb: [0.5, 0.5, 1.1, 0.5, 0.45, 1.3], fx: "portal", chapter: "STAGE FINAL — LA SINGULARITÉ",
@@ -169,5 +276,11 @@ const CINEMATICS = {
   }
 };
 
+// Mode Histoire : adversaire et arène de chaque stage selon le personnage choisi
+const STORY_PATH = {
+  aurelia: [["hai", 0], ["hai", 1], ["hai", 2]],
+  hai: [["aurelia", 0], ["aurelia", 1], ["aurelia", 2]],
+  eye: [["aurelia", 0], ["hai", 1], ["aurelia", 2]]
+};
 const COMBO_WORDS = { 3: "SAUVAGE !", 4: "BRUTAL !", 5: "BRUTAL !", 6: "IMPITOYABLE !", 7: "IMPITOYABLE !", 8: "DÉVASTATEUR !", 10: "LÉGENDAIRE !", 13: "DIVIN !" };
 function comboWord(n) { let w = ""; for (const k in COMBO_WORDS) if (n >= +k) w = COMBO_WORDS[k]; return w; }

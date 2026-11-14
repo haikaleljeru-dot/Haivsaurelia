@@ -5,11 +5,11 @@
    ===================================================================== */
 const KEYMAP = {
   p1: { l: ["KeyA"], r: ["KeyD"], u: ["KeyW"], d: ["KeyS"], lp: ["KeyF"], hp: ["KeyG"], sp: ["KeyH"], tp: ["KeyR"], gp: ["KeyT"], ex: ["KeyY"], xr: ["KeyB"],
-        f1: ["Digit1"], f2: ["Digit2"], f3: ["Digit3"], dash: ["ShiftLeft"], brk: ["KeyV"], tn: ["KeyC"] },
+        f1: ["Digit1"], f2: ["Digit2"], f3: ["Digit3"], f4: ["Digit4"], f5: ["Digit5"], dash: ["ShiftLeft"], brk: ["KeyV"], tn: ["KeyC"] },
   p2: { l: ["ArrowLeft"], r: ["ArrowRight"], u: ["ArrowUp"], d: ["ArrowDown"], lp: ["KeyJ", "Numpad1"], hp: ["KeyK", "Numpad2"], sp: ["KeyL", "Numpad3"], tp: ["KeyU", "Numpad4"],
-        gp: ["KeyI", "Numpad5"], ex: ["KeyO", "Numpad6"], xr: ["KeyP", "Numpad0"], f1: ["Digit8", "Numpad7"], f2: ["Digit9", "Numpad8"], f3: ["Digit0", "Numpad9"], dash: ["ShiftRight", "NumpadEnter"], brk: ["KeyM", "NumpadAdd"], tn: ["Period", "NumpadDecimal", "KeyN"] }
+        gp: ["KeyI", "Numpad5"], ex: ["KeyO", "Numpad6"], xr: ["KeyP", "Numpad0"], f1: ["Digit8", "Numpad7"], f2: ["Digit9", "Numpad8"], f3: ["Digit0", "Numpad9"], f4: ["Minus"], f5: ["Equal"], dash: ["ShiftRight", "NumpadEnter"], brk: ["KeyM", "NumpadAdd"], tn: ["Period", "NumpadDecimal", "KeyN"] }
 };
-const AZERTY_LABEL = { KeyA: "Q", KeyQ: "A", KeyW: "Z", KeyZ: "W", KeyM: ",", Semicolon: "M", Digit1: "1/&", Digit2: "2/é", Digit3: "3/\"", Digit8: "8/_", Digit9: "9/ç", Digit0: "0/à" };
+const AZERTY_LABEL = { KeyA: "Q", KeyQ: "A", KeyW: "Z", KeyZ: "W", KeyM: ",", Semicolon: "M", Digit1: "1/&", Digit2: "2/é", Digit3: "3/\"", Digit8: "8/_", Digit9: "9/ç", Digit0: "0/à", Digit4: "4/'", Digit5: "5/(", Minus: ")", Equal: "=" };
 function detectLayout() {
   if (Settings.layout !== "auto") return Settings.layout;
   if (typeof Input !== "undefined" && Input.hwLayout) return Input.hwLayout; // disposition matérielle réelle (Chromium)
@@ -19,7 +19,7 @@ function detectLayout() {
 function keyLabel(code) {
   if (detectLayout() === "azerty" && AZERTY_LABEL[code]) return AZERTY_LABEL[code];
   return code.replace(/^Key/, "").replace(/^Digit/, "").replace("ArrowLeft", "←").replace("ArrowRight", "→").replace("ArrowUp", "↑").replace("ArrowDown", "↓")
-    .replace("ShiftLeft", "Maj G").replace("ShiftRight", "Maj D").replace("Period", ".").replace(/^Numpad/, "Pavé ");
+    .replace("ShiftLeft", "Maj G").replace("ShiftRight", "Maj D").replace("Period", ".").replace("Minus", "-").replace("Equal", "=").replace(/^Numpad/, "Pavé ");
 }
 function keyOf(p, act) { return keyLabel(KEYMAP[p][act][0]); }
 
@@ -67,6 +67,22 @@ const Input = {
     if (b(4) && b(5)) { I.xr = 1; I.tp = 0; I.gp = 0; }
     if (b(10) || b(11)) I.brk = 1; if (b(8)) I.tn = 1;
   },
+  // échantillon local (clavier J1+J2, manette 1, tactile, file d'appuis) — utilisé par le duel en ligne
+  sampleLocal() {
+    const I = blankInput();
+    Input.fromKeys(I, KEYMAP.p1); Input.fromKeys(I, KEYMAP.p2);
+    try { Input.fromPad(I, Input.padFor({ ctrl: "p1" })); } catch (e) { }
+    for (const k in Input.touch) if (Input.touch[k]) I[k] = 1;
+    const edge = {}, dirs = [], keep = []; let blocked = false;
+    for (const ev of Input.queue) {
+      const k = Input.actionOf(ev.c, "p1", true);
+      if (!k) { keep.push(ev); continue; }
+      if (blocked || edge[k]) { blocked = true; keep.push(ev); continue; }
+      edge[k] = 1; I[k] = 1; if (k === "l" || k === "r" || k === "u" || k === "d") dirs.push(k);
+    }
+    Input.queue = keep;
+    return { I, edge, dirs };
+  },
   padFor(f) {
     const pads = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
     if (f.ctrl === "p1") return pads[0]; if (f.ctrl === "p2") return pads[1]; return null;
@@ -76,6 +92,7 @@ const Input = {
     f.edge = null; f.evDirs = null;
     if (f.ctrl === "ai") return aiThink(f, opp);
     if (f.ctrl === "dummy") return dummyThink(f, opp);
+    if (f.ctrl === "net") return Online.read(f);
     const I = blankInput(), alsoP2 = f.ctrl === "p1" && Match.type !== "2p";
     Input.fromKeys(I, KEYMAP[f.ctrl]);
     if (alsoP2) Input.fromKeys(I, KEYMAP.p2);

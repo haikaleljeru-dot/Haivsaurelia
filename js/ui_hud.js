@@ -1,7 +1,7 @@
 /* =====================================================================
    RÉGLAGES + HUD DE COMBAT (barres asymétriques, super 3 segments, combos)
    ===================================================================== */
-const Settings = Object.assign({ outfit: "hd", portrait: "cyber", roundTime: 99, layout: "auto", quality: "haute", touch: "auto", music: true, sfx: true, voice: true, musicVol: 0.55, sfxVol: 0.8, voiceVol: 1, shake: true, subs: true, perf: false },
+const Settings = Object.assign({ outfit: "hd", portrait: "cyber", roundTime: 99, layout: "auto", quality: "haute", touch: "auto", music: true, sfx: true, voice: true, musicVol: 0.55, sfxVol: 0.8, voiceVol: 1, shake: true, subs: true, perf: false, lang: "fr", haptics: true, replay: true },
   (() => { try { return JSON.parse(localStorage.getItem("mk_av_settings") || "{}"); } catch (e) { return {}; } })());
 function saveSettings() { try { localStorage.setItem("mk_av_settings", JSON.stringify(Settings)); } catch (e) { } applySettings(); }
 function applySettings() {
@@ -19,8 +19,9 @@ function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.
 const UI = {
   noteLast: {}, bannerT: 0, comboT: [0, 0], bub: [null, null], perfT: 0,
   // Bulle de réplique + portrait HUD qui pulse pendant que le personnage parle
-  speech(side, text, dur) {
+  speech(side, text, dur, vid) {
     if (Game.mode !== "fight") return;
+    if (typeof I18N !== "undefined") text = I18N.sub(vid, text);
     UI.bub[side] = { until: performance.now() + Math.max(0.9, dur) * 1000 + 250 };
     const b = $("#bub" + side); b.textContent = "« " + text + " »"; b.classList.remove("on"); void b.offsetWidth; b.classList.add("on");
     $(side ? ".hs.r" : ".hs.l").classList.add("talk");
@@ -30,13 +31,13 @@ const UI = {
     F.forEach((f, i) => {
       const s = i ? ".hs.r" : ".hs.l";
       $(s + " .nm").textContent = f.ch.name;
-      const pk = Settings.portrait === "real" ? (f.id === "aurelia" ? "aur_real" : "hai_real") : (f.id === "aurelia" ? "aur_cyber" : "hai_cyber");
+      const pk = f.ch.portraits[Settings.portrait === "real" ? "real" : "cyber"];
       $(s + " .pf").style.backgroundImage = `url(${IMG[pk] ? IMG[pk].src : ""})`;
       $("#combo" + i).className = "combo " + (i ? "r" : "l");
     });
     $("#banner").className = ""; $("#finishBox").classList.remove("on");
     UI.bub = [null, null]; $$(".bub").forEach(b => b.classList.remove("on")); $$(".hs").forEach(h => h.classList.remove("talk", "danger", "xrfull"));
-    $("#rlabel").textContent = Match.training ? "ENTRAÎNEMENT" : "ROUND " + Match.round + " • " + Match.stage.name;
+    $("#rlabel").textContent = Match.training ? (Match.training.tutorial ? L("TUTORIEL") : L("ENTRAÎNEMENT")) : (Match.tower ? L("TOUR") + " " + (Match.tower.floor + 1) + "/10 • " : Match.type === "online" ? "ONLINE • " : "") + "ROUND " + Match.round + " • " + L(Match.stage.name);
     UI.roundSeals(); UI.updateHud(true);
   },
   updateHud(force) {
@@ -91,21 +92,24 @@ const UI = {
     if (n >= 6) Audio2.voice("ann_excellent", { ch: "ann", ifFree: true }); else if (n >= 4) Audio2.voice("ann_brutal", { ch: "ann", ifFree: true });
   },
   roundSeals() {
-    [".hs.l", ".hs.r"].forEach((s, i) => { const box = $(s + " .seals"); box.innerHTML = ""; for (let k = 0; k < 2; k++) box.appendChild(el("div", "seal" + (Match.wins[i] > k ? " won" : ""))); box.style.display = Match.training ? "none" : "flex"; });
+    [".hs.l", ".hs.r"].forEach((s, i) => { const box = $(s + " .seals"); box.innerHTML = ""; for (let k = 0; k < Match.winsNeeded; k++) box.appendChild(el("div", "seal" + (Match.wins[i] > k ? " won" : ""))); box.style.display = Match.training ? "none" : "flex"; });
   },
   finishPrompt(att) {
     const b = $("#finishBox");
     if (!att) { b.classList.remove("on"); return; }
-    if (att.ctrl === "ai") { b.classList.remove("on"); return; }
-    const p = att.ctrl, f = att.ch.fatalities, st = Match.stage;
+    if (att.ctrl === "ai" || (att.ctrl === "net" && typeof Online !== "undefined" && Online.localSide !== att.side)) { b.classList.remove("on"); return; }
+    const p = att.ctrl === "net" ? "p1" : att.ctrl, f = att.ch.fatalities, st = Match.stage, fr = att.ch.friendship, an = att.ch.animality, net = att.ctrl === "net";
     b.innerHTML = `<div class="ft">${att.ch.name} — ACHÈVE TON ADVERSAIRE</div>
       <div class="fc">☠ ${f[0].name} : <b>${f[0].codeTxt}</b> &nbsp;ou&nbsp; <kbd>${keyOf(p, "f1")}</kbd></div>
       <div class="fc">☠ ${f[1].name} : <b>${f[1].codeTxt}</b> &nbsp;ou&nbsp; <kbd>${keyOf(p, "f2")}</kbd></div>
       <div class="fc">⚡ Stage Fatality — ${st.stageFatality} : <b>${STAGE_FATALITY_CODE.codeTxt}</b> &nbsp;ou&nbsp; <kbd>${keyOf(p, "f3")}</kbd></div>
+      <div class="fc" style="color:#f9a8d4">💖 Friendship — ${fr.name} : <b>${fr.codeTxt}</b> &nbsp;ou&nbsp; <kbd>${keyOf(p, "f4")}</kbd></div>
+      <div class="fc" style="color:#86efac">🐾 Animality — ${an.name} : <b>${an.codeTxt}</b> &nbsp;ou&nbsp; <kbd>${keyOf(p, "f5")}</kbd></div>
       <div class="fc" style="color:#fdba74">✦ Brutality : achève avec un Spécial / EX / X-Ray</div>
       <div class="tm" id="finishT">10</div>
-      <div><button class="btn red" data-fin="0">Fatality 1</button><button class="btn red" data-fin="1">Fatality 2</button><button class="btn red" data-fin="2">Stage</button></div>`;
-    b.querySelectorAll("[data-fin]").forEach(bt => bt.onclick = () => { if (Match.state === "finish") { const w = +bt.dataset.fin; startFinisher(att, F[1 - att.side], w === 2 ? "stage" : "fatality" + (w + 1)); } });
+      ${net ? "" : `<div><button class="btn red" data-fin="fatality1">Fatality 1</button><button class="btn red" data-fin="fatality2">Fatality 2</button><button class="btn red" data-fin="stage">Stage</button><button class="btn red" data-fin="friendship">Friendship</button><button class="btn red" data-fin="animality">Animality</button></div>`}`;
+    b.querySelectorAll("[data-fin]").forEach(bt => bt.onclick = () => { if (Match.state === "finish") startFinisher(att, F[1 - att.side], bt.dataset.fin); });
+    if (typeof I18N !== "undefined") I18N.apply(b);
     b.classList.add("on");
   },
   finishTimer(n) { const e = $("#finishT"); if (e) e.textContent = n; },

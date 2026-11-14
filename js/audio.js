@@ -208,6 +208,22 @@ const Audio2 = (() => {
         if (Math.random() < 0.55) blip(N(this.root + 36 + ch[Math.floor(Math.random() * 4)] + (Math.random() < 0.3 ? 12 : 0)), t, 0.035);
         if (I > 0.6 && step % 8 === 7) noiseRiser(t, sd * 2);
       } },
+    telaviv: { bpm: 118, steps: 16, bars: 4, root: 43, dyn: true, // Sol Hijaz — électro méditerranéenne (darbouka + synthés néon)
+      scale: [0, 1, 4, 5, 7, 8, 10, 12],
+      riff: [0, 2, 1, 2, 3, 2, 1, 0, 4, 3, 2, 3, 2, 1, 0, -1],
+      voice(step, bar, t, sd, I) {
+        const pat = ["D", "", "t", "", "D", "D", "t", "", "D", "", "t", "t", "D", "", "t", "k"], p = pat[step];
+        if (p === "D") drum("doum", t, 0.7); else if (p === "t") drum("tek", t, 0.32); else if (p === "k") drum("tek", t, 0.18);
+        if (step % 4 === 0) drum("kick", t, 0.85);
+        if (step % 2 === 1) drum("hat", t, 0.12 + I * 0.08);
+        const ch = [0, 0, -2, 1][bar % 4];
+        if (step % 2 === 0) bass(N(this.root - 12 + ch + (step % 8 === 6 ? 12 : 0)), t, sd * 1.6, 0.3, "sawtooth");
+        if (step === 0) { pad(N(this.root + 12 + ch), t, sd * 16, 0.035, "sawtooth", 900); pad(N(this.root + 16 + ch), t, sd * 16, 0.025, "sawtooth", 900); }
+        const r = this.riff[step], sc = this.scale; const n = r < 0 ? -2 : sc[r];
+        if (step % 2 === 0 || I > 0.5) pluck(N(this.root + 24 + n + ch), t, I > 0.4 ? 0.07 : 0.05);
+        if (I > 0.45 && step % 4 === 2) lead(N(this.root + 36 + sc[(step + bar) % 7]), t, sd * 1.2, 0.025);
+        if (I > 0.7 && (step === 4 || step === 12)) drum("clap", t, 0.3);
+      } },
     finish: { bpm: 70, steps: 16, bars: 1, root: 33,
       voice(step, bar, t, sd) { if (step === 0 || step === 3) drum("heart", t, 0.9); if (step === 0) drone(N(this.root), t, sd * 16, 0.15); } }
   };
@@ -244,11 +260,18 @@ const Audio2 = (() => {
     stopMusic();
     const th = THEMES[name]; if (!th) return;
     const s = { name, th, step: 0, bar: 0, next: ctx.currentTime + 0.08, timer: null };
-    const sd = 60 / th.bpm / 4;
+    // v4 : les thèmes de combat accélèrent (jusqu'à +12 %) et gagnent des couches quand l'intensité monte
+    const fight = ["paris", "jerusalem", "singularity", "telaviv"].includes(name);
     s.timer = setInterval(() => {
       if (!ctx) return;
       while (s.next < ctx.currentTime + 0.18) {
+        const sd = 60 / (th.bpm * (fight ? 1 + 0.12 * intensity : 1)) / 4;
         try { th.voice(s.step, s.bar, s.next, sd, intensity); } catch (e) { }
+        if (fight) try {
+          if (intensity > 0.55 && s.step % 4 === 2) drum("tick", s.next, 0.1 + intensity * 0.1);
+          if (intensity > 0.8 && s.step === 8) drum("taiko", s.next, 0.45);
+          if (intensity > 0.85 && s.step === 12 && s.bar % 2 === 1) noiseRiser(s.next, sd * 4);
+        } catch (e) { }
         s.step++; if (s.step >= th.steps) { s.step = 0; s.bar++; }
         s.next += sd;
       }
@@ -257,6 +280,9 @@ const Audio2 = (() => {
   }
   function stopMusic() { if (seq) { clearInterval(seq.timer); seq = null; } }
   function setIntensity(v) { intensity = Math.max(0, Math.min(1, v)); }
+  // flux audio pour l'enregistrement des clips (MediaRecorder)
+  let sdest = null;
+  function streamDest() { if (!ctx || !ctx.createMediaStreamDestination) return null; if (!sdest) { try { sdest = ctx.createMediaStreamDestination(); comp.connect(sdest); } catch (e) { sdest = null; } } return sdest; }
 
   // ---------- Annonceur ----------
   let frVoice = null;
@@ -342,6 +368,6 @@ const Audio2 = (() => {
     else if (text && !voicesLoaded) say(text, kind === "fatality" ? 0.3 : 0.45, kind === "fatality" ? 0.75 : 0.9);
   }
 
-  return { init, unlock, play, playMusic, stopMusic, setIntensity, set, settings, say, announce, setDuck, loadVoices, voice, stopVoice, hasVoice, voiceDur, busy, level, wave, tick, suspend,
+  return { init, unlock, play, playMusic, stopMusic, setIntensity, set, settings, say, announce, setDuck, loadVoices, voice, stopVoice, hasVoice, voiceDur, busy, level, wave, tick, suspend, streamDest, get intensity() { return intensity; },
     get ctx() { return ctx; }, get unlocked() { return unlocked; }, get state() { return ctx ? ctx.state : "none"; }, get voiceCount() { return Object.keys(VBUF).length + Object.keys(VHTML).length; }, get decodedCount() { return Object.keys(VBUF).length; }, get voiceErrors() { return voicesFailed; }, onVoice: null };
 })();

@@ -84,6 +84,7 @@ function dummyThink(f, opp) {
   const I = blankInput(), m = Match.training ? Match.training.dummy : "idle";
   if (m === "guard") I.d = 1;
   else if (m === "jump") { if (frameCount % 70 === 0) I.u = 1; }
+  else if (m === "attack") { const d = Math.abs(opp.x - f.x); if (d > 200) { if (opp.x > f.x) I.r = 1; else I.l = 1; } else if (frameCount % 80 === 0 && canAct(f)) I.lp = 1; }
   else if (m === "ai") { const save = Match.difficulty; Match.difficulty = "novice"; const r = aiThink(f, opp); Match.difficulty = save; return r; }
   return I;
 }
